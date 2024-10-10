@@ -1,16 +1,16 @@
 import React from 'react';
 
-const ClientDashboard = () => {
+const WorkerDashboard = () => {
   return (
     <div>
-      <h2>Panel de Cliente</h2>
+      <h2>Panel de cliente</h2>
       <ul>
-        <li>Ver detalles de la cuenta</li>
-        <li>Consultar el historial de interacciones</li>
-        <li>Solicitar soporte</li>
+        <li>Acceso a tareas asignadas</li>
+        <li>Gestionar interacciones con clientes</li>
+        <li>Registro de horas de trabajo</li>
       </ul>
     </div>
   );
 };
 
-export default ClientDashboard;
+export default WorkerDashboard;
