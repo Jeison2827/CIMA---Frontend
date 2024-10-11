@@ -21,20 +21,42 @@ export const getClientById = createAsyncThunk('clients/getById', async (clientId
 
 // Acción para crear un cliente
 export const createClient = createAsyncThunk('clients/create', async (newClient) => {
-  const response = await axios.post('/api/clients', newClient);
+  const response = await axios.post('http://localhost:3000/developer/clients', newClient,{
+    headers:{
+      'accesstoken':localStorage.getItem('accessToken'),
+    }
+  });
   return response.data;
 });
 
 // Acción para actualizar un cliente
 export const updateClient = createAsyncThunk('clients/update', async ({ id, updatedClient }) => {
-  const response = await axios.put(`/api/clients/${id}`, updatedClient);
+  const response = await axios.put(`http://localhost:3000/developer/clients/${id}`, updatedClient,{
+    headers:{
+      'accesstoken':localStorage.getItem('accessToken'),
+    }
+  });
   return response.data;
 });
 
 // Acción para eliminar un cliente
-export const deleteClient = createAsyncThunk('clients/delete', async (clientId) => {
-  const response = await axios.delete(`/api/clients/${clientId}`);
-  return response.data;
+export const deleteClient = createAsyncThunk('clients/delete', async (clientId, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`http://localhost:3000/developer/clients/${clientId}`, {
+      headers: {
+        'accesstoken': localStorage.getItem('accessToken'),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      // Si el servidor devuelve una respuesta de error con detalles
+      return rejectWithValue(error.response.data);
+    } else {
+      // Si hay un error de red u otro tipo de error sin respuesta clara del servidor
+      return rejectWithValue({ message: 'Error en el servidor. Intenta nuevamente más tarde.' });
+    }
+  }
 });
 
 const clientSlice = createSlice({

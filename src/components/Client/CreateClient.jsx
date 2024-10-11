@@ -11,6 +11,8 @@ const CreateClient = () => {
     contact: '',
     address: '',
     email: '',
+    password:'',
+    role:'',
     phone: '',
   });
 
@@ -21,12 +23,17 @@ const CreateClient = () => {
     
     // Validación básica
     if (formData.name === '' || formData.email === '') {
-      toast.error('El nombre y el email son obligatorios', { position: toast.POSITION.TOP_CENTER });
+      toast.error('El nombre y el email son obligatorios', { position: "top-center" });
       return;
     }
-
+    try{
     dispatch(createClient(formData));
-    toast.success('Cliente creado con éxito', { position: toast.POSITION.TOP_CENTER });
+    toast.success('Cliente creado con éxito', { position: "top-center" });
+    }
+    catch(error){
+      toast.error(error, { position: "top-center" });
+    }
+    
     
     // Limpiar formulario
     setFormData({

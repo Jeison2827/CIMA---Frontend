@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import './ClientTable.css'; // Asegúrate de que tengas este archivo CSS
+import { useDispatch } from 'react-redux';
+import { deleteClient, updateClient } from '../../redux/slices/clientSlice'; // Importar las acciones
+import './ClientTable.css';
 
 const ClientTable = () => {
-  // Datos ficticios para pruebas (puedes cambiar esto por tus datos reales)
+  const dispatch = useDispatch();
+
   const allClients = [
     { id: 1, name: 'Juan Pérez', email: 'juan@example.com', address: 'Calle 123', phone: '555-1234' },
     { id: 2, name: 'Ana García', email: 'ana@example.com', address: 'Avenida 456', phone: '555-5678' },
@@ -16,15 +19,57 @@ const ClientTable = () => {
   ];
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [clientsPerPage] = useState(3); // Número de clientes por página
+  const [clientsPerPage] = useState(3);
+  const [isEditing, setIsEditing] = useState(false);
+  const [clientToEdit, setClientToEdit] = useState(null);
 
-  // Obtener clientes actuales de acuerdo a la paginación
   const indexOfLastClient = currentPage * clientsPerPage;
   const indexOfFirstClient = indexOfLastClient - clientsPerPage;
   const currentClients = allClients.slice(indexOfFirstClient, indexOfLastClient);
 
-  // Función para cambiar de página
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleDelete = (clientId) => {
+    dispatch(deleteClient(clientId))
+      .unwrap() // Para obtener la acción de manera sincrónica
+      .then(() => {
+        alert('Cliente eliminado con éxito');
+      })
+      .catch((error) => {
+        if (error.message) {
+          alert(`Error al eliminar cliente: ${error.message}`);
+        } else {
+          console.error('Error inesperado:', error);
+          alert('Error al eliminar cliente. Intenta de nuevo más tarde.');
+        }
+      });
+  };
+  
+
+  const handleEdit = (client) => {
+    setIsEditing(true);
+    setClientToEdit(client);
+  };
+
+  const handleUpdate = () => {
+    const updatedClient = {
+      ...clientToEdit,
+      name: prompt('Editar nombre:', clientToEdit.name),
+      email: prompt('Editar email:', clientToEdit.email),
+      address: prompt('Editar dirección:', clientToEdit.address),
+      phone: prompt('Editar teléfono:', clientToEdit.phone),
+    };
+
+    dispatch(updateClient({ id: clientToEdit.id, updatedClient }))
+      .then(() => {
+        alert('Cliente actualizado con éxito');
+        setIsEditing(false);
+        setClientToEdit(null);
+      })
+      .catch((error) => {
+        console.error('Error al actualizar cliente:', error);
+      });
+  };
 
   return (
     <div className="client-table-container">
@@ -47,8 +92,8 @@ const ClientTable = () => {
               <td>{client.address}</td>
               <td>{client.phone}</td>
               <td>
-                <button className="edit-button" onClick={() => alert(`Editar cliente ${client.name}`)}>Editar</button>
-                <button className="delete-button" onClick={() => alert(`Eliminar cliente ${client.name}`)}>Eliminar</button>
+                <button className="edit-button" onClick={() => handleEdit(client)}>Editar</button>
+                <button className="delete-button" onClick={() => handleDelete(client.id)}>Eliminar</button>
               </td>
             </tr>
           ))}
@@ -66,6 +111,14 @@ const ClientTable = () => {
           </button>
         ))}
       </div>
+
+      {isEditing && clientToEdit && (
+        <div className="edit-form">
+          <h3>Editando Cliente: {clientToEdit.name}</h3>
+          <button onClick={handleUpdate}>Guardar Cambios</button>
+          <button onClick={() => setIsEditing(false)}>Cancelar</button>
+        </div>
+      )}
     </div>
   );
 };

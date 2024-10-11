@@ -1,47 +1,56 @@
-/* Login page styles */
-.login-container {
-    background-color: #fff;
-    padding: 40px;
-    max-width: 400px;
-    margin: 100px auto;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
+/* Login page styles */  
+.login-container {  
+    background-color: #fff;  
+    padding: 40px;  
+    max-width: 400px;  
+    margin: 100px auto;  
+    border-radius: 8px;  
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+}  
   
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  input {
-    width: calc(100% - 20px);
-    margin: 10px auto;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #910000;
-  }
-  
-  button:hover {
-    background-color: #218838;
-  }
-  
-  p {
-    color: red;
-    text-align: center;
-    margin-top: 10px;
-  }
-  
-  @media (max-width: 768px) {
-    .login-container {
-      padding: 20px;
-      margin-top: 50px;
-    }
-  }
-  
+h2 {  
+    text-align: center;  
+    margin-bottom: 20px;  
+}  
+
+/* Cambiar selector de input a .input */  
+.input {  
+    border: none;  
+    outline: none;  
+    border-radius: 15px;  
+    padding: 1em;  
+    background-color: #ccc;  
+    box-shadow: inset 2px 5px 10px rgba(0,0,0,0.3);  
+    transition: 300ms ease-in-out;  
+}  
+
+.input:focus {  
+    background-color: white;  
+    transform: scale(1.05);  
+    box-shadow: 13px 13px 100px #969696,  
+                -13px -13px 100px #ffffff;  
+}  
+
+.login-container button {  
+    width: 100%;  
+    padding: 10px;  
+    margin-top: 20px;  
+    background-color: #910000;  
+}  
+
+.login-container button:hover {  
+    background-color: #218838;  
+}  
+
+p {  
+    color: red;  
+    text-align: center;  
+    margin-top: 10px;  
+}  
+
+@media (max-width: 768px) {  
+  .login-container {  
+    padding: 20px;  
+    margin-top: 50px;  
+  }  
+}
