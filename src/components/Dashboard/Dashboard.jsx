@@ -10,6 +10,9 @@ import ProjectStatus from '../ProjectStatus/ProjectStatus';
 import CustomerSupport from '../CustomerSupport/CustomerSupport';
 import ClientProjects from '../ClientProjects/ClientProjects'; 
 import WorkerProjects from '../WorkerProjects/WorkerProjects';  
+import WorkerTasks from '../WorkerTasks/WorkerTasks';
+import FaqClient from '../FaqClient/FaqClient';
+import FaqAdmin from '../FaqAdmin/FaqAdmin';
 import './Dashboard.css'; 
 import { logout } from '../../redux/slices/authSlice';
 
@@ -26,6 +29,8 @@ const Dashboard = () => {
   const [showCustomerSupport, setShowCustomerSupport] = useState(false); 
   const [showClientProjects, setShowClientProjects] = useState(false);
   const [showWorkerProjects, setShowWorkerProjects] = useState(false);
+  const [showWorkerTasks, setShowWorkerTasks] = useState(false);
+  
 
   if (!user || !user.role) {
     return <p>Acceso no autorizado</p>;
@@ -40,6 +45,9 @@ const Dashboard = () => {
     setShowCustomerSupport(false);
     setShowClientProjects(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
 
   const toggleExcelExport = () => {
@@ -50,6 +58,9 @@ const Dashboard = () => {
     setShowCustomerSupport(false);
     setShowClientProjects(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
 
   const showAdminDashboard = () => {
@@ -60,6 +71,9 @@ const Dashboard = () => {
     setShowCustomerSupport(false);
     setShowClientProjects(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
 
   const showProjectStatusDashboard = () => {
@@ -70,6 +84,9 @@ const Dashboard = () => {
     setShowCustomerSupport(false);
     setShowClientProjects(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
 
   const showCustomerSupportDashboard = () => {
@@ -80,6 +97,9 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowClientProjects(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
 
   const showClientProjectsDashboard = () => {
@@ -90,6 +110,9 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
     setShowWorkerProyects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
   const showWorkerProjectsDashboard = () => {
     setShowWorkerProjects(true);
@@ -99,7 +122,51 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
     setShowClientProjects(false);
+    setShowWorkerTasks(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
   };
+  const showWorkerTasksDashboard = () => {  
+    setShowWorkerTasks(true);
+    setShowWorkerProjects(false);
+    setShowAdminPanel(false);
+    setShowExcelImport(false);
+    setShowExcelExport(false);
+    setShowProjectStatus(false);
+    setShowCustomerSupport(false);
+    setShowClientProjects(false);
+    setShowFaq(false);
+    setShowFaqAdmin(false);
+  };
+  const [showFaq, setShowFaq] = useState(false);
+
+const showFaqDashboard = () => {
+  setShowFaq(true);
+  setShowAdminPanel(false);
+  setShowExcelImport(false);
+  setShowExcelExport(false);
+  setShowProjectStatus(false);
+  setShowCustomerSupport(false);
+  setShowClientProjects(false);
+  setShowWorkerProjects(false);
+  setShowWorkerTasks(false);
+  setShowFaqAdmin(false);
+};
+const [showFaqAdmin, setShowFaqAdmin] = useState(false);
+
+const showFaqAdminDashboard = () => {
+  setShowFaqAdmin(true);
+  setShowAdminPanel(false);
+  setShowExcelImport(false);
+  setShowExcelExport(false);
+  setShowProjectStatus(false);
+  setShowCustomerSupport(false);
+  setShowClientProjects(false);
+  setShowWorkerProjects(false);
+  setShowWorkerTasks(false);
+};
+
+
 
   const handleLogout = () => {
     dispatch(logout());
@@ -121,12 +188,13 @@ const Dashboard = () => {
               <li onClick={toggleExcelExport}><i className="fas fa-file-export"></i> Exportar Excel</li>
               <li onClick={showProjectStatusDashboard}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={showCustomerSupportDashboard}><i className="fas fa-headset"></i> Soporte</li>
+              <li onClick={showFaqAdminDashboard}><i className="fas fa-question-circle"></i> Gestionar FAQs</li>
             </>
           )}
           {user.role === 'Worker' && (
             <>
               <li onClick={showWorkerProjectsDashboard}><i className="fas fa-project-diagram"></i> Proyectos</li>
-              <li><i className="fas fa-tasks"></i> Tareas</li>
+              <li onClick={showWorkerTasksDashboard}><i className="fas fa-project-diagram"></i> Tareas</li>
             </>
           )}
           {user.role === 'Client' && (
@@ -134,6 +202,7 @@ const Dashboard = () => {
               <li onClick={showClientProjectsDashboard}><i className="fas fa-project-diagram"></i> Mis Proyectos</li>
               <li onClick={showProjectStatusDashboard}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={showCustomerSupportDashboard}><i className="fas fa-headset"></i> Soporte al Cliente</li>
+              <li onClick={showFaqDashboard}><i className="fas fa-question-circle"></i> Preguntas Frecuentes</li>
             </>
           )}
           <li onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Cerrar Sesión</li>
@@ -147,12 +216,15 @@ const Dashboard = () => {
 
         <section className="dashboard-content">
           {showAdminPanel && user.role === 'Admin' && <AdminDashboard />}
+          {showFaqAdmin && user.role === 'Admin' && <FaqAdmin />}
           {showExcelImport && <ExcelImport />}
           {showExcelExport && <ExcelExport />}
           {showProjectStatus && <ProjectStatus userRole={user.role} />}
           {showCustomerSupport && <CustomerSupport />}
-          {showClientProjects && user.role === 'Client' && <ClientProjects />} {/* Corrección aquí */}
+          {showClientProjects && user.role === 'Client' && <ClientProjects />} 
+          {showFaq && user.role === 'Client' && <FaqClient />}
           {showWorkerProjects && user.role === 'Worker' && <WorkerProjects />}
+          {showWorkerTasks && user.role === 'Worker' && <WorkerTasks />} 
           {user.role === 'Worker' && <WorkerDashboard />}
           
                 </section>
