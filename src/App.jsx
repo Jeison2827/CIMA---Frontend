@@ -9,7 +9,7 @@ import ClientTable from './components/Client/ClientTable';
 import RoleManagement from './components/Roles/RoleManagement'; // Nueva gestión de roles
 import ProtectedRoute from './routes/ProtectedRoute';
 import Dashboard from './components/Dashboard/Dashboard'; // Importa el Dashboard aquí
-
+import CreateUser from './components/Client/CreateUser';
 const App = () => {
   const { user } = useSelector((state) => state.auth);
 
@@ -29,12 +29,14 @@ const App = () => {
           }
         />
 
+
         {/* Ruta protegida para crear un cliente */}
         <Route
-          path="/create-client"
+          path="/create-users-register"
           element={
             <ProtectedRoute roles={['Admin']}>
-              <CreateClient />
+              {/*<CreateClient />*/}
+              <CreateUser />
             </ProtectedRoute>
           }
         />
