@@ -5,9 +5,7 @@ const WorkerDashboard = () => {
     <div>
       <h2>Panel de cliente</h2>
       <ul>
-        <li>Acceso a tareas asignadas</li>
-        <li>Gestionar interacciones con clientes</li>
-        <li>Registro de horas de trabajo</li>
+        <li>Bien Venido</li>
       </ul>
     </div>
   );

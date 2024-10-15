@@ -8,7 +8,8 @@ import ExcelImport from '../Excel/ExcelImport';
 import ExcelExport from '../Excel/ExcelExport';
 import ProjectStatus from '../ProjectStatus/ProjectStatus'; 
 import CustomerSupport from '../CustomerSupport/CustomerSupport';
-import ClientProjects from '../ClientProjects/ClientProjects';  // Corregir la importación
+import ClientProjects from '../ClientProjects/ClientProjects'; 
+import WorkerProjects from '../WorkerProjects/WorkerProjects';  
 import './Dashboard.css'; 
 import { logout } from '../../redux/slices/authSlice';
 
@@ -24,6 +25,7 @@ const Dashboard = () => {
   const [showProjectStatus, setShowProjectStatus] = useState(false);
   const [showCustomerSupport, setShowCustomerSupport] = useState(false); 
   const [showClientProjects, setShowClientProjects] = useState(false);
+  const [showWorkerProjects, setShowWorkerProjects] = useState(false);
 
   if (!user || !user.role) {
     return <p>Acceso no autorizado</p>;
@@ -37,6 +39,7 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
     setShowClientProjects(false);
+    setShowWorkerProyects(false);
   };
 
   const toggleExcelExport = () => {
@@ -46,6 +49,7 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
     setShowClientProjects(false);
+    setShowWorkerProyects(false);
   };
 
   const showAdminDashboard = () => {
@@ -55,6 +59,7 @@ const Dashboard = () => {
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
     setShowClientProjects(false);
+    setShowWorkerProyects(false);
   };
 
   const showProjectStatusDashboard = () => {
@@ -64,6 +69,7 @@ const Dashboard = () => {
     setShowExcelExport(false);
     setShowCustomerSupport(false);
     setShowClientProjects(false);
+    setShowWorkerProyects(false);
   };
 
   const showCustomerSupportDashboard = () => {
@@ -73,6 +79,7 @@ const Dashboard = () => {
     setShowExcelExport(false);
     setShowProjectStatus(false);
     setShowClientProjects(false);
+    setShowWorkerProyects(false);
   };
 
   const showClientProjectsDashboard = () => {
@@ -82,6 +89,16 @@ const Dashboard = () => {
     setShowExcelExport(false);
     setShowProjectStatus(false);
     setShowCustomerSupport(false);
+    setShowWorkerProyects(false);
+  };
+  const showWorkerProjectsDashboard = () => {
+    setShowWorkerProjects(true);
+    setShowAdminPanel(false);
+    setShowExcelImport(false);
+    setShowExcelExport(false);
+    setShowProjectStatus(false);
+    setShowCustomerSupport(false);
+    setShowClientProjects(false);
   };
 
   const handleLogout = () => {
@@ -108,7 +125,7 @@ const Dashboard = () => {
           )}
           {user.role === 'Worker' && (
             <>
-              <li><i className="fas fa-project-diagram"></i> Proyectos</li>
+              <li onClick={showWorkerProjectsDashboard}><i className="fas fa-project-diagram"></i> Proyectos</li>
               <li><i className="fas fa-tasks"></i> Tareas</li>
             </>
           )}
@@ -129,15 +146,16 @@ const Dashboard = () => {
         </header>
 
         <section className="dashboard-content">
-          {/* Mostrar el contenido dependiendo del botón presionado */}
           {showAdminPanel && user.role === 'Admin' && <AdminDashboard />}
           {showExcelImport && <ExcelImport />}
           {showExcelExport && <ExcelExport />}
           {showProjectStatus && <ProjectStatus userRole={user.role} />}
           {showCustomerSupport && <CustomerSupport />}
-          {user.role === 'Client' && showClientProjects } {/* Mostrar interfaz de "Mis Proyectos" */}
+          {showClientProjects && user.role === 'Client' && <ClientProjects />} {/* Corrección aquí */}
+          {showWorkerProjects && user.role === 'Worker' && <WorkerProjects />}
           {user.role === 'Worker' && <WorkerDashboard />}
-        </section>
+          
+                </section>
       </main>
     </div>
   );
