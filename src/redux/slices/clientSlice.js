@@ -21,7 +21,7 @@ export const getClientById = createAsyncThunk('clients/getById', async (clientId
 
 // Acción para crear un cliente
 export const createClient = createAsyncThunk('clients/create', async (newClient) => {
-  const response = await axios.post('http://localhost:3000/developer/clients', newClient,{
+  const response = await axios.post('http://localhost:3000/developer/users/register', newClient,{
     headers:{
       'accesstoken':localStorage.getItem('accessToken'),
     }

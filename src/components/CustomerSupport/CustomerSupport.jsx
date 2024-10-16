@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './CustomerSupport.css'; // Estilos CSS opcionales
 
+
+
 const CustomerSupport = () => {
   const [formData, setFormData] = useState({
     name: '',
