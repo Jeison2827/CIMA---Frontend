@@ -9,7 +9,7 @@ const AdminDashboard = () => {
       <h1>Panel de Administración</h1>
 
       <div className="admin-dashboard-cards">
-        <Link to="/create-users-register" className="card">
+        <Link to="/create-client" className="card">
           <i className="fas fa-user-plus"></i>
           <h2>Crear Cliente</h2>
           <p>Agrega nuevos clientes al sistema.</p>

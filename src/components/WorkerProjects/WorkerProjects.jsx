@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './WorkerProjects.css';
+
 
 const WorkerProjects = () => {
   const [projects, setProjects] = useState([]);

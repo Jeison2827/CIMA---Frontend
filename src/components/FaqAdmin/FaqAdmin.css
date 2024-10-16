@@ -1,0 +1,64 @@
+.faq-admin-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .faq-add-container,
+  .faq-edit-container {
+    margin-bottom: 20px;
+  }
+  
+  .faq-add-container input,
+  .faq-add-container textarea,
+  .faq-edit-container input,
+  .faq-edit-container textarea {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .faq-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .faq-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  .faq-item h2 {
+    margin: 0;
+  }
+  
+  button {
+    margin-right: 10px;
+  }
+  
+  .faq-view-container button {
+    margin-top: 10px;
+  }
+  
+  .faq-edit-container input,
+  .faq-edit-container textarea {
+    margin-top: 10px;
+  }
+  
