@@ -10,6 +10,9 @@ import ProjectStatus from '../ProjectStatus/ProjectStatus';
 import CustomerSupport from '../CustomerSupport/CustomerSupport';
 import ClientProjects from '../ClientProjects/ClientProjects'; 
 import WorkerProjects from '../WorkerProjects/WorkerProjects';  
+import WorkerTasks from '../WorkerTasks/WorkerTasks';
+import FaqClient from '../FaqClient/FaqClient';
+import FaqAdmin from '../FaqAdmin/FaqAdmin';
 import './Dashboard.css'; 
 import { logout } from '../../redux/slices/authSlice';
 
@@ -18,87 +21,16 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Estados para controlar qué vista mostrar
-  const [showExcelImport, setShowExcelImport] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(true); 
-  const [showExcelExport, setShowExcelExport] = useState(false); 
-  const [showProjectStatus, setShowProjectStatus] = useState(false);
-  const [showCustomerSupport, setShowCustomerSupport] = useState(false); 
-  const [showClientProjects, setShowClientProjects] = useState(false);
-  const [showWorkerProjects, setShowWorkerProjects] = useState(false);
+  // Estado para manejar la vista activa
+  const [activeView, setActiveView] = useState('adminDashboard'); // Vista por defecto
 
   if (!user || !user.role) {
     return <p>Acceso no autorizado</p>;
   }
 
-  // Funciones para alternar la visibilidad de los componentes
-  const toggleExcelImport = () => {
-    setShowExcelImport(true);
-    setShowAdminPanel(false);
-    setShowExcelExport(false);
-    setShowProjectStatus(false);
-    setShowCustomerSupport(false);
-    setShowClientProjects(false);
-    setShowWorkerProyects(false);
-  };
-
-  const toggleExcelExport = () => {
-    setShowExcelExport(true);
-    setShowAdminPanel(false);
-    setShowExcelImport(false);
-    setShowProjectStatus(false);
-    setShowCustomerSupport(false);
-    setShowClientProjects(false);
-    setShowWorkerProyects(false);
-  };
-
-  const showAdminDashboard = () => {
-    setShowAdminPanel(true);
-    setShowExcelImport(false);
-    setShowExcelExport(false);
-    setShowProjectStatus(false);
-    setShowCustomerSupport(false);
-    setShowClientProjects(false);
-    setShowWorkerProyects(false);
-  };
-
-  const showProjectStatusDashboard = () => {
-    setShowProjectStatus(true);
-    setShowAdminPanel(false);
-    setShowExcelImport(false);
-    setShowExcelExport(false);
-    setShowCustomerSupport(false);
-    setShowClientProjects(false);
-    setShowWorkerProyects(false);
-  };
-
-  const showCustomerSupportDashboard = () => {
-    setShowCustomerSupport(true);
-    setShowAdminPanel(false);
-    setShowExcelImport(false);
-    setShowExcelExport(false);
-    setShowProjectStatus(false);
-    setShowClientProjects(false);
-    setShowWorkerProyects(false);
-  };
-
-  const showClientProjectsDashboard = () => {
-    setShowClientProjects(true);
-    setShowAdminPanel(false);
-    setShowExcelImport(false);
-    setShowExcelExport(false);
-    setShowProjectStatus(false);
-    setShowCustomerSupport(false);
-    setShowWorkerProyects(false);
-  };
-  const showWorkerProjectsDashboard = () => {
-    setShowWorkerProjects(true);
-    setShowAdminPanel(false);
-    setShowExcelImport(false);
-    setShowExcelExport(false);
-    setShowProjectStatus(false);
-    setShowCustomerSupport(false);
-    setShowClientProjects(false);
+  // Función para cambiar la vista activa
+  const changeView = (view) => {
+    setActiveView(view);
   };
 
   const handleLogout = () => {
@@ -116,24 +48,26 @@ const Dashboard = () => {
         <ul className="sidebar-menu">
           {user.role === 'Admin' && (
             <>
-              <li onClick={showAdminDashboard}><i className="fas fa-home"></i> Home</li>
-              <li onClick={toggleExcelImport}><i className="fas fa-file-excel"></i> Importar Excel</li>
-              <li onClick={toggleExcelExport}><i className="fas fa-file-export"></i> Exportar Excel</li>
-              <li onClick={showProjectStatusDashboard}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
-              <li onClick={showCustomerSupportDashboard}><i className="fas fa-headset"></i> Soporte</li>
+              <li onClick={() => changeView('adminDashboard')}><i className="fas fa-home"></i> Home</li>
+              <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Importar Excel</li>
+              <li onClick={() => changeView('excelExport')}><i className="fas fa-file-export"></i> Exportar Excel</li>
+              <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
+              <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte</li>
+              <li onClick={() => changeView('faqAdmin')}><i className="fas fa-question-circle"></i> Gestionar FAQs</li>
             </>
           )}
           {user.role === 'Worker' && (
             <>
-              <li onClick={showWorkerProjectsDashboard}><i className="fas fa-project-diagram"></i> Proyectos</li>
-              <li><i className="fas fa-tasks"></i> Tareas</li>
+              <li onClick={() => changeView('workerProjects')}><i className="fas fa-project-diagram"></i> Proyectos</li>
+              <li onClick={() => changeView('workerTasks')}><i className="fas fa-tasks"></i> Tareas</li>
             </>
           )}
           {user.role === 'Client' && (
             <>
-              <li onClick={showClientProjectsDashboard}><i className="fas fa-project-diagram"></i> Mis Proyectos</li>
-              <li onClick={showProjectStatusDashboard}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
-              <li onClick={showCustomerSupportDashboard}><i className="fas fa-headset"></i> Soporte al Cliente</li>
+              <li onClick={() => changeView('clientProjects')}><i className="fas fa-project-diagram"></i> Mis Proyectos</li>
+              <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
+              <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte al Cliente</li>
+              <li onClick={() => changeView('faqClient')}><i className="fas fa-question-circle"></i> Preguntas Frecuentes</li>
             </>
           )}
           <li onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Cerrar Sesión</li>
@@ -146,16 +80,17 @@ const Dashboard = () => {
         </header>
 
         <section className="dashboard-content">
-          {showAdminPanel && user.role === 'Admin' && <AdminDashboard />}
-          {showExcelImport && <ExcelImport />}
-          {showExcelExport && <ExcelExport />}
-          {showProjectStatus && <ProjectStatus userRole={user.role} />}
-          {showCustomerSupport && <CustomerSupport />}
-          {showClientProjects && user.role === 'Client' && <ClientProjects />} {/* Corrección aquí */}
-          {showWorkerProjects && user.role === 'Worker' && <WorkerProjects />}
-          {user.role === 'Worker' && <WorkerDashboard />}
-          
-                </section>
+          {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
+          {activeView === 'excelImport' && <ExcelImport />}
+          {activeView === 'excelExport' && <ExcelExport />}
+          {activeView === 'projectStatus' && <ProjectStatus userRole={user.role} />}
+          {activeView === 'customerSupport' && <CustomerSupport />}
+          {activeView === 'clientProjects' && user.role === 'Client' && <ClientProjects />}
+          {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
+          {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
+          {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
+          {activeView === 'faqAdmin' && user.role === 'Admin' && <FaqAdmin />}
+        </section>
       </main>
     </div>
   );
