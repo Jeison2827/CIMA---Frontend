@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Table, Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const ClientProjects = () => {
+const AdminDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [projectTasks, setProjectTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showNewProjectModal, setShowNewProjectModal] = useState(false); // Modal para nuevo proyecto
-  const [showNewTaskModal, setShowNewTaskModal] = useState(false); // Modal para nueva tarea
+  const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [showNewTaskModal, setShowNewTaskModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [newProjectName, setNewProjectName] = useState(''); // Nombre del nuevo proyecto
-  const [newProjectStatus, setNewProjectStatus] = useState('En progreso'); // Estado del nuevo proyecto
-  const [newTaskDescription, setNewTaskDescription] = useState(''); // Descripción de la nueva tarea
-  const [newTaskStatus, setNewTaskStatus] = useState('Pendiente'); // Estado de la nueva tarea
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectStatus, setNewProjectStatus] = useState('En progreso');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [newTaskStatus, setNewTaskStatus] = useState('Pendiente');
+  const [showUserManagement, setShowUserManagement] = useState(false); // Modal for managing users
 
-  // Simulamos la obtención de los proyectos
+  // Simulate fetching data for projects and users
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = [
-          { id: 1, name: 'Proyecto A', status: 'En progreso' },
-          { id: 2, name: 'Proyecto B', status: 'Finalizado' },
-          { id: 3, name: 'Proyecto C', status: 'En espera' },
+          { id: 1, name: 'Proyecto A', status: 'En progreso', owner: 'Juan' },
+          { id: 2, name: 'Proyecto B', status: 'Finalizado', owner: 'Maria' },
+          { id: 3, name: 'Proyecto C', status: 'En espera', owner: 'Ana' },
         ];
         setProjects(response);
         setLoading(false);
@@ -36,7 +37,7 @@ const ClientProjects = () => {
     fetchProjects();
   }, []);
 
-  // Función para mostrar tareas en el modal
+  // Display tasks in modal
   const handleViewDetails = async (project) => {
     setSelectedProject(project);
     try {
@@ -52,20 +53,21 @@ const ClientProjects = () => {
     }
   };
 
-  // Función para agregar un nuevo proyecto
+  // Add new project
   const handleAddNewProject = () => {
     const newProject = {
       id: projects.length + 1,
       name: newProjectName,
       status: newProjectStatus,
+      owner: 'Admin', // Added owner for admin role
     };
     setProjects([...projects, newProject]);
-    setShowNewProjectModal(false); // Cerrar el modal
-    setNewProjectName(''); // Limpiar los campos
+    setShowNewProjectModal(false);
+    setNewProjectName('');
     setNewProjectStatus('En progreso');
   };
 
-  // Función para agregar una nueva tarea
+  // Add new task
   const handleAddNewTask = () => {
     const newTask = {
       id: projectTasks.length + 1,
@@ -73,24 +75,31 @@ const ClientProjects = () => {
       status: newTaskStatus,
     };
     setProjectTasks([...projectTasks, newTask]);
-    setShowNewTaskModal(false); // Cerrar el modal
-    setNewTaskDescription(''); // Limpiar los campos
+    setShowNewTaskModal(false);
+    setNewTaskDescription('');
     setNewTaskStatus('Pendiente');
   };
 
-  // Función para manejar el cambio de estado de una tarea
-  const handleTaskStatusChange = (taskId, newStatus) => {
-    setProjectTasks(prevTasks =>
-      prevTasks.map(task =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
+  // Manage users
+  const handleManageUsers = () => {
+    setShowUserManagement(true);
   };
 
-  // Función para cerrar el modal
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedProject(null);
+  // Close user management modal
+  const handleCloseUserManagement = () => {
+    setShowUserManagement(false);
+  };
+
+  // Delete a project
+  const handleDeleteProject = (projectId) => {
+    setProjects(projects.filter((project) => project.id !== projectId));
+  };
+
+  // Change task status
+  const handleTaskStatusChange = (taskId, newStatus) => {
+    setProjectTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task))
+    );
   };
 
   if (loading) return <p>Cargando proyectos...</p>;
@@ -98,44 +107,50 @@ const ClientProjects = () => {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Proyectos en Ejecución</h1>
+      <h1 className="mb-4">Panel de Control del Administrador</h1>
 
-      {/* Botón para agregar nuevo proyecto */}
-      <Button variant="success" className="mb-3" onClick={() => setShowNewProjectModal(true)}>
-        Agregar Nuevo Proyecto
-      </Button>
-
-      <div className="row">
-        <div className="col-12">
-          <table className="table table-bordered">
-            <thead className="thead-light">
-              <tr>
-                <th>#</th>
-                <th>Nombre del Proyecto</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((project, index) => (
-                <tr key={project.id}>
-                  <td>{index + 1}</td>
-                  <td>{project.name}</td>
-                  <td>{project.status}</td>
-                  <td>
-                    <Button variant="primary" onClick={() => handleViewDetails(project)}>
-                      Ver Detalles
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* Project and User Management Section */}
+      <div className="mb-4 d-flex justify-content-between">
+        <Button variant="success" onClick={() => setShowNewProjectModal(true)}>
+          Agregar Nuevo Proyecto
+        </Button>
+        <Button variant="info" onClick={handleManageUsers}>
+          Gestión de Usuarios
+        </Button>
       </div>
 
-      {/* Modal para visualizar y editar tareas */}
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre del Proyecto</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {projects.map((project, index) => (
+            <tr key={project.id}>
+              <td>{index + 1}</td>
+              <td>{project.name}</td>
+              <td>{project.status}</td>
+              <td>{project.owner}</td>
+              <td>
+                <Button variant="primary" onClick={() => handleViewDetails(project)}>
+                  Ver Detalles
+                </Button>{' '}
+                <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
+                  Eliminar
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      {/* Modal for viewing and editing tasks */}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Detalles del Proyecto: {selectedProject?.name}</Modal.Title>
         </Modal.Header>
@@ -159,7 +174,7 @@ const ClientProjects = () => {
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cerrar
           </Button>
           <Button variant="primary" onClick={() => setShowNewTaskModal(true)}>
@@ -168,7 +183,7 @@ const ClientProjects = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal para agregar nuevo proyecto */}
+      {/* Modal for adding new project */}
       <Modal show={showNewProjectModal} onHide={() => setShowNewProjectModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Agregar Nuevo Proyecto</Modal.Title>
@@ -208,7 +223,7 @@ const ClientProjects = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal para agregar nueva tarea */}
+      {/* Modal for adding new task */}
       <Modal show={showNewTaskModal} onHide={() => setShowNewTaskModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Agregar Nueva Tarea</Modal.Title>
@@ -232,8 +247,8 @@ const ClientProjects = () => {
                 onChange={(e) => setNewTaskStatus(e.target.value)}
               >
                 <option value="Pendiente">Pendiente</option>
-                <option value="Cumplida">Cumplida</option>
                 <option value="En progreso">En progreso</option>
+                <option value="Cumplida">Cumplida</option>
               </Form.Control>
             </Form.Group>
           </Form>
@@ -247,8 +262,23 @@ const ClientProjects = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal for managing users */}
+      <Modal show={showUserManagement} onHide={handleCloseUserManagement}>
+        <Modal.Header closeButton>
+          <Modal.Title>Gestión de Usuarios</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Aquí iría la gestión de los usuarios. Ejemplo de listado de usuarios y sus roles.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseUserManagement}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
 
-export default ClientProjects;
+export default AdminDashboard;

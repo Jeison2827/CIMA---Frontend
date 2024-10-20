@@ -6,7 +6,6 @@ import AdminDashboard from './components/Dashboard/AdminDashboard';
 import CreateClient from './components/Client/CreateClient';
 import EditClient from './components/Client/EditClient';
 import ClientTable from './components/Client/ClientTable';
-import RoleManagement from './components/Roles/RoleManagement'; // Nueva gestión de roles
 import ProtectedRoute from './routes/ProtectedRoute';
 import Dashboard from './components/Dashboard/Dashboard'; // Importa el Dashboard aquí
 import CreateUser from './components/Client/CreateUser';
@@ -66,7 +65,6 @@ const App = () => {
           path="/roles"
           element={
             <ProtectedRoute roles={['Admin']}>
-              <RoleManagement /> {/* Nueva gestión de roles */}
             </ProtectedRoute>
           }
         />
