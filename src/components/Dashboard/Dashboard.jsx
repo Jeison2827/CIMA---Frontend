@@ -6,13 +6,13 @@ import WorkerDashboard from './WorkerDashboard';
 import ClientDashboard from './ClientDashboard';
 import ExcelImport from '../Excel/ExcelImport'; 
 import ExcelExport from '../Excel/ExcelExport';
-import ProjectStatus from '../ProjectStatus/ProjectStatus'; 
 import CustomerSupport from '../CustomerSupport/CustomerSupport';
 import ClientProjects from '../ClientProjects/ClientProjects'; 
 import WorkerProjects from '../WorkerProjects/WorkerProjects';  
 import WorkerTasks from '../WorkerTasks/WorkerTasks';
 import FaqClient from '../FaqClient/FaqClient';
 import FaqAdmin from '../FaqAdmin/FaqAdmin';
+import AdminProyects from '../AdminProyects/AdminProyects'
 import './Dashboard.css'; 
 import { logout } from '../../redux/slices/authSlice';
 
@@ -49,9 +49,9 @@ const Dashboard = () => {
           {user.role === 'Admin' && (
             <>
               <li onClick={() => changeView('adminDashboard')}><i className="fas fa-home"></i> Home</li>
+              <li onClick={() => changeView('adminProyects')}><i className="fas fa-question-circle"></i> Administrar Proyectos</li>
               <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Importar Excel</li>
               <li onClick={() => changeView('excelExport')}><i className="fas fa-file-export"></i> Exportar Excel</li>
-              <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte</li>
               <li onClick={() => changeView('faqAdmin')}><i className="fas fa-question-circle"></i> Gestionar FAQs</li>
             </>
@@ -65,7 +65,6 @@ const Dashboard = () => {
           {user.role === 'Client' && (
             <>
               <li onClick={() => changeView('clientProjects')}><i className="fas fa-project-diagram"></i> Mis Proyectos</li>
-              <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte al Cliente</li>
               <li onClick={() => changeView('faqClient')}><i className="fas fa-question-circle"></i> Preguntas Frecuentes</li>
             </>
@@ -83,13 +82,15 @@ const Dashboard = () => {
           {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
           {activeView === 'excelImport' && <ExcelImport />}
           {activeView === 'excelExport' && <ExcelExport />}
-          {activeView === 'projectStatus' && <ProjectStatus userRole={user.role} />}
           {activeView === 'customerSupport' && <CustomerSupport />}
           {activeView === 'clientProjects' && user.role === 'Client' && <ClientProjects />}
           {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
           {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
           {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
           {activeView === 'faqAdmin' && user.role === 'Admin' && <FaqAdmin />}
+          {activeView === 'workerAdmin' && user.role === 'Admin' && <AdminProyects />}
+          {activeView === 'adminProyects' && user.role === 'Admin' && <AdminProyects />}
+
         </section>
       </main>
     </div>

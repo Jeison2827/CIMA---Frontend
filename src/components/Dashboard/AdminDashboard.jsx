@@ -11,7 +11,7 @@ const AdminDashboard = () => {
       <div className="admin-dashboard-cards">
         <Link to="/create-users-register" className="card">
           <i className="fas fa-user-plus"></i>
-          <h2>Crear Cliente</h2>
+          <h2>Crear Usuario</h2>
           <p>Agrega nuevos clientes al sistema.</p>
         </Link>
 
@@ -21,11 +21,6 @@ const AdminDashboard = () => {
           <p>Administra la información de los clientes.</p>
         </Link>
 
-        <Link to="/roles" className="card">
-          <i className="fas fa-user-shield"></i>
-          <h2>Gestionar Roles</h2>
-          <p>Asigna y gestiona roles de usuario.</p>
-        </Link>
       </div>
     </div>
   );

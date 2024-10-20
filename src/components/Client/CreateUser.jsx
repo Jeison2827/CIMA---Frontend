@@ -4,13 +4,16 @@ import { createClient } from '../../redux/slices/clientSlice';
 import './CreateClient.css'; // Importar los estilos
 import { ToastContainer, toast } from 'react-toastify'; // Importa react-toastify
 import 'react-toastify/dist/ReactToastify.css'; // Estilos de react-toastify
-import axios from "axios"
-const CreateUser = () => {
+
+const CreateClient = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: ""
+    name: '',
+    contact: '',
+    address: '',
+    email: '',
+    password:'',
+    role:'Client', // Por defecto seleccionamos 'Client'
+    phone: '',
   });
 
   const dispatch = useDispatch();
@@ -24,52 +27,22 @@ const CreateUser = () => {
       return;
     }
     try{
-    dispatch(createClient(formData));
-    toast.success('Cliente creado con éxito', { position: "top-center" });
+      dispatch(createClient(formData));
+      toast.success('Cliente creado con éxito', { position: "top-center" });
     }
     catch(error){
       toast.error(error, { position: "top-center" });
     }
-    
     
     // Limpiar formulario
     setFormData({
       name: '',
       email: '',
       password: '',
-      role:'',
+      role: 'Client', // Reseteamos el select a 'Client'
     });
   };
-  
-  
-  function  Prueba (){
-    let data = JSON.stringify({
-        name: FormData.name,
-        email: FormData.email,
-        password: FormData.password,
-        role: FormData.role
-      });
-      
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3000/developer/users/register',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Authorization': '••••••'
-        },
-        data : data
-      };
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
-  
-  
+
   return (
     <div className="create-client-container">
       <ToastContainer />
@@ -89,7 +62,7 @@ const CreateUser = () => {
         <div className="form-group">
           <label htmlFor="email">Correo</label>
           <input
-            type="text"
+            type="email"
             id="email"
             placeholder="Correo Electronico"
             value={formData.email}
@@ -100,7 +73,7 @@ const CreateUser = () => {
         <div className="form-group">
           <label htmlFor="password">Contraseña</label>
           <input
-            type="text"
+            type="password"
             id="password"
             placeholder="Contraseña"
             value={formData.password}
@@ -108,21 +81,24 @@ const CreateUser = () => {
           />
         </div>
 
+        {/* Cambiamos el input por un select para el rol */}
         <div className="form-group">
           <label htmlFor="role">Rol <span className="required">*</span></label>
-          <input
-            type="role"
+          <select
             id="role"
-            placeholder="Rol"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          />
+          >
+            <option value="Client">Client</option>
+            <option value="Admin">Admin</option>
+            <option value="Worker">Worker</option>
+          </select>
         </div>
 
-        <button type="submit" onClick={Prueba} className="btn-submit">Crear Cliente</button>
+        <button type="submit" className="btn-submit">Crear Cliente</button>
       </form>
     </div>
   );
 };
 
-export default CreateUser;
+export default CreateClient;
