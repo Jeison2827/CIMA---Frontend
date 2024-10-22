@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Modal, Button, Table } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ClientTable.css';
 
@@ -11,7 +10,8 @@ const ClientTable = () => {
   const [clientToDelete, setClientToDelete] = useState(null); 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
-  const [notification, setNotification] = useState(null); // Notificación de éxito
+  const [notification, setNotification] = useState(null); 
+  const [searchQuery, setSearchQuery] = useState(''); // Estado para el texto de búsqueda
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -30,21 +30,21 @@ const ClientTable = () => {
 
   const handleEditClick = (client) => {
     setSelectedClient(client); 
-    setIsEditModalOpen(true); // Abrir el modal de edición
+    setIsEditModalOpen(true);
   };
 
   const handleDeleteClick = (client) => {
     setClientToDelete(client); 
-    setIsDeleteModalOpen(true); // Abrir el modal de confirmación de eliminación
+    setIsDeleteModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
-    setIsEditModalOpen(false); // Cerrar el modal de edición
+    setIsEditModalOpen(false);
     setSelectedClient(null); 
   };
 
   const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false); // Cerrar el modal de eliminación
+    setIsDeleteModalOpen(false);
     setClientToDelete(null); 
   };
 
@@ -56,9 +56,9 @@ const ClientTable = () => {
           client.userId === selectedClient.userId ? selectedClient : client
         )
       );
-      setNotification('Cliente actualizado con éxito'); // Mostrar notificación
-      setTimeout(() => setNotification(null), 3000); // Ocultar notificación después de 3 segundos
-      handleCloseEditModal(); 
+      setNotification('Cliente actualizado con éxito');
+      setTimeout(() => setNotification(null), 3000);
+      handleCloseEditModal();
     } catch (error) {
       console.error('Error updating client:', error);
     }
@@ -70,13 +70,20 @@ const ClientTable = () => {
       setClients((prevClients) =>
         prevClients.filter((client) => client.userId !== clientToDelete.userId)
       );
-      setNotification('Cliente eliminado con éxito'); // Mostrar notificación
-      setTimeout(() => setNotification(null), 3000); // Ocultar notificación después de 3 segundos
-      handleCloseDeleteModal(); 
+      setNotification('Cliente eliminado con éxito');
+      setTimeout(() => setNotification(null), 3000);
+      handleCloseDeleteModal();
     } catch (error) {
       console.error('Error deleting client:', error);
     }
   };
+
+  // Filtrar clientes según el texto de búsqueda
+  const filteredClients = clients.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   if (loading) {
     return <div>Loading...</div>;
@@ -85,7 +92,18 @@ const ClientTable = () => {
   return (
     <div className="client-table-container">
       <h1>Lista de Usuarios</h1>
-      {notification && <div className="notification">{notification}</div>} {/* Mostrar notificación */}
+      
+      {notification && <div className="notification">{notification}</div>}
+
+      {/* Barra de búsqueda */}
+      <input
+        type="text"
+        placeholder="Buscar por nombre o email"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)} // Actualizar el estado de búsqueda
+        className="search-bar"
+      />
+
       <table className="client-table">
         <thead>
           <tr>
@@ -98,7 +116,7 @@ const ClientTable = () => {
           </tr>
         </thead>
         <tbody>
-          {clients.map((client) => (
+          {filteredClients.map((client) => (
             <tr key={client.userId}>
               <td>{client.userId}</td>
               <td>{client.name}</td>
@@ -150,10 +168,10 @@ const ClientTable = () => {
                   }
                 />
               </label>
-              <button type="button" onClick={handleSaveChanges}> {/* Asegúrate que está ejecutando la función */}
+              <button type="button" onClick={handleSaveChanges}>
                 Guardar Cambios
               </button>
-              <button type="button" onClick={handleCloseEditModal}> {/* También ejecuta el cierre */}
+              <button type="button" onClick={handleCloseEditModal}>
                 Cancelar
               </button>
             </form>
@@ -169,10 +187,10 @@ const ClientTable = () => {
             <p>
               ¿Estás seguro de que deseas eliminar al cliente <strong>{clientToDelete.name}</strong>?
             </p>
-            <button type="button" onClick={handleConfirmDelete}> {/* Ejecuta la eliminación */}
+            <button type="button" onClick={handleConfirmDelete}>
               Sí, eliminar
             </button>
-            <button type="button" onClick={handleCloseDeleteModal}> {/* Ejecuta el cierre */}
+            <button type="button" onClick={handleCloseDeleteModal}>
               Cancelar
             </button>
           </div>
