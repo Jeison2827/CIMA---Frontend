@@ -1,64 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
 .faq-admin-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .faq-add-container,
-  .faq-edit-container {
-    margin-bottom: 20px;
-  }
-  
-  .faq-add-container input,
-  .faq-add-container textarea,
-  .faq-edit-container input,
-  .faq-edit-container textarea {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  .faq-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .faq-item {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-  }
-  
-  .faq-item h2 {
-    margin: 0;
-  }
-  
-  button {
-    margin-right: 10px;
-  }
-  
-  .faq-view-container button {
-    margin-top: 10px;
-  }
-  
-  .faq-edit-container input,
-  .faq-edit-container textarea {
-    margin-top: 10px;
-  }
-  
+  padding: 40px;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  color: #333;
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #444;
+}
+
+.faq-add-container,
+.faq-edit-container {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 40px;
+  transition: all 0.3s ease;
+}
+
+.faq-add-container:hover,
+.faq-edit-container:hover {
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.faq-add-container input,
+.faq-add-container textarea,
+.faq-edit-container input,
+.faq-edit-container textarea {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 14px 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f9f9fb;
+  transition: all 0.3s ease;
+}
+
+.faq-add-container input:focus,
+.faq-add-container textarea:focus,
+.faq-edit-container input:focus,
+.faq-edit-container textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+  background-color: #fff;
+}
+
+/* Estilos de los botones */
+button {
+  padding: 8px 18px; /* Botones más pequeños */
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  border: none;
+  border-radius: 25px; /* Redondeado y compacto */
+  font-size: 14px; /* Texto más pequeño */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra más pequeña */
+  outline: none;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #5a78e3, #9557d3);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px); /* Ligero efecto de elevación */
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.faq-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.faq-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.faq-item h2 {
+  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+
+.faq-item p {
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.faq-item .faq-view-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Botones para editar y eliminar con colores de acción */
+.faq-item .faq-actions button {
+  padding: 6px 16px; /* Botones más pequeños para acciones */
+  font-size: 12px;
+  border-radius: 20px; /* Bordes más compactos */
+}
+
+.faq-item .faq-actions button.edit {
+  background: linear-gradient(135deg, #28a745, #38b754);
+}
+
+.faq-item .faq-actions button.edit:hover {
+  background: linear-gradient(135deg, #218838, #2f9948);
+}
+
+.faq-item .faq-actions button.delete {
+  background: linear-gradient(135deg, #dc3545, #e15465);
+}
+
+.faq-item .faq-actions button.delete:hover {
+  background: linear-gradient(135deg, #c82333, #d84555);
+}
+
+.faq-item .faq-actions button + button {
+  margin-left: 10px;
+}

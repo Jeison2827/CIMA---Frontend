@@ -1,131 +1,131 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './AdminProyects.css';
 
 const ClientTable = () => {
-  const [projects, setProjects] = useState([]); // Estado para proyectos
-  const [workers, setWorkers] = useState([]); // Estado para trabajadores
-  const [selectedProject, setSelectedProject] = useState(null); // Proyecto seleccionado
-  const [newProjectName, setNewProjectName] = useState(''); // Nombre de nuevo proyecto o para edición
-  const [newProjectPlan, setNewProjectPlan] = useState(''); // Plan del proyecto nuevo o para edición
-  const [assignedWorkers, setAssignedWorkers] = useState([]); // Trabajadores asignados
-  const [taskDescription, setTaskDescription] = useState(''); // Descripción de la tarea
-  const [taskStatus, setTaskStatus] = useState('pendiente'); // Estado de la tarea
-  const [notification, setNotification] = useState(null); // Notificación de éxito o error
-  const [showProjectModal, setShowProjectModal] = useState(false); // Modal para creación de proyecto
-  const [showAssignmentModal, setShowAssignmentModal] = useState(false); // Modal para asignar trabajadores
-  const [showEditModal, setShowEditModal] = useState(false); // Modal para editar proyecto
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal para eliminar proyecto
+  // Datos iniciales para proyectos y trabajadores
+  const [projects, setProjects] = useState([
+    { id: 1, name: "Proyecto Alpha", plan: "Plan inicial para Alpha", taskDescription: "Desarrollar el backend", taskStatus: "pendiente", contractType: "Platino" },
+    { id: 2, name: "Proyecto Beta", plan: "Plan para desarrollo del frontend", taskDescription: "Implementar el diseño", taskStatus: "en progreso", contractType: "Oro" },
+  ]);
+  
+  const [workers, setWorkers] = useState([
+    { id: 1, name: "Juan Perez", projectId: 1 },
+    { id: 2, name: "Ana Gómez", projectId: 1 },
+    { id: 3, name: "Carlos López", projectId: 2 },
+  ]);
 
-  // Cargar proyectos y trabajadores al iniciar
-  useEffect(() => {
-    const fetchProjectsAndWorkers = async () => {
-      try {
-        const projectsResponse = await axios.get('http://localhost:3000/projects');
-        const workersResponse = await axios.get('http://localhost:3000/workers');
-        setProjects(projectsResponse.data); // Guardar proyectos
-        setWorkers(workersResponse.data); // Guardar trabajadores
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchProjectsAndWorkers();
-  }, []);
+  // Estados para gestionar la interacción
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectPlan, setNewProjectPlan] = useState('');
+  const [newProjectContractType, setNewProjectContractType] = useState('Platino'); // Estado para el tipo de contrato
+  const [assignedWorkers, setAssignedWorkers] = useState([]);
+  const [taskDescription, setTaskDescription] = useState('');
+  const [taskStatus, setTaskStatus] = useState('pendiente');
+  const [notification, setNotification] = useState(null);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Crear un nuevo proyecto
-  const handleCreateProject = async () => {
+  const handleCreateProject = () => {
     if (!newProjectName || !newProjectPlan) {
-      setNotification('Por favor, ingresa el nombre y el plan del proyecto.');
+      setNotification('Por favor, ingresa el nombre, el plan y el tipo de contrato del proyecto.');
       return;
     }
 
-    try {
-      const newProject = {
-        name: newProjectName,
-        plan: newProjectPlan,
-      };
-      const response = await axios.post('http://localhost:3000/projects', newProject);
-      setProjects([...projects, response.data]); // Agregar nuevo proyecto a la lista
-      setNewProjectName(''); // Limpiar nombre del proyecto
-      setNewProjectPlan(''); // Limpiar plan del proyecto
-      setNotification('Proyecto creado con éxito.');
-      setTimeout(() => setNotification(null), 3000);
-      setShowProjectModal(false); // Cerrar modal de proyecto
-    } catch (error) {
-      console.error('Error creating project:', error);
-      setNotification('Error al crear el proyecto.');
-    }
+    const newProject = {
+      id: projects.length + 1,
+      name: newProjectName,
+      plan: newProjectPlan,
+      taskDescription: '',
+      taskStatus: 'pendiente',
+      contractType: newProjectContractType // Añadido el tipo de contrato
+    };
+
+    setProjects([...projects, newProject]);
+    setNewProjectName('');
+    setNewProjectPlan('');
+    setNewProjectContractType('Platino'); // Reset tipo de contrato
+    setNotification('Proyecto creado con éxito.');
+    setTimeout(() => setNotification(null), 3000);
+    setShowProjectModal(false);
   };
 
-  // Manejar la asignación de trabajadores a un proyecto
-  const handleAssignWorkers = async () => {
+  // Asignar trabajadores a un proyecto
+  const handleAssignWorkers = () => {
     if (!selectedProject || assignedWorkers.length === 0 || !taskDescription) {
       setNotification('Por favor, selecciona un proyecto, asigna trabajadores y define la tarea.');
       return;
     }
 
-    try {
-      await axios.post(`http://localhost:3000/projects/${selectedProject.id}/assign-workers`, {
-        workers: assignedWorkers,
-        taskDescription,
-        taskStatus,
-      });
+    setProjects(projects.map((project) =>
+      project.id === selectedProject.id
+        ? { ...project, taskDescription, taskStatus }
+        : project
+    ));
 
-      setNotification('Trabajadores asignados con éxito.');
-      setTimeout(() => setNotification(null), 3000); // Limpiar la notificación después de 3 segundos
-      setAssignedWorkers([]); // Limpiar asignaciones
-      setTaskDescription(''); // Limpiar descripción
-      setTaskStatus('pendiente'); // Resetear estado de tarea
-      setShowAssignmentModal(false); // Cerrar modal de asignación
-    } catch (error) {
-      console.error('Error assigning workers:', error);
-      setNotification('Error al asignar trabajadores.');
-    }
+    setWorkers(
+      workers.map((worker) =>
+        assignedWorkers.includes(worker.id.toString())
+          ? { ...worker, projectId: selectedProject.id }
+          : worker
+      )
+    );
+
+    setNotification('Trabajadores asignados con éxito.');
+    setTimeout(() => setNotification(null), 3000);
+    setAssignedWorkers([]);
+    setTaskDescription('');
+    setTaskStatus('pendiente');
+    setShowAssignmentModal(false);
   };
 
-  // Editar proyecto
-  const handleEditProject = async () => {
-    if (!newProjectName || !newProjectPlan) {
-      setNotification('Por favor, ingresa el nombre y el plan del proyecto.');
+  // Editar proyecto (incluyendo trabajadores asignados, descripción y estado de la tarea)
+  const handleEditProject = () => {
+    if (!newProjectName || !newProjectPlan || !newProjectContractType) {
+      setNotification('Por favor, ingresa todos los detalles del proyecto.');
       return;
     }
 
-    try {
-      const updatedProject = {
-        name: newProjectName,
-        plan: newProjectPlan,
-      };
-      await axios.put(`http://localhost:3000/projects/${selectedProject.id}`, updatedProject);
+    setProjects(
+      projects.map((project) =>
+        project.id === selectedProject.id
+          ? {
+              ...project,
+              name: newProjectName,
+              plan: newProjectPlan,
+              taskDescription: taskDescription,
+              taskStatus: taskStatus,
+              contractType: newProjectContractType // Actualización del tipo de contrato
+            }
+          : project
+      )
+    );
 
-      setProjects(
-        projects.map((project) =>
-          project.id === selectedProject.id ? { ...project, ...updatedProject } : project
-        )
-      );
-      setNotification('Proyecto actualizado con éxito.');
-      setTimeout(() => setNotification(null), 3000);
-      setShowEditModal(false); // Cerrar modal de edición
-    } catch (error) {
-      console.error('Error updating project:', error);
-      setNotification('Error al actualizar el proyecto.');
-    }
+    setWorkers(
+      workers.map((worker) =>
+        assignedWorkers.includes(worker.id.toString())
+          ? { ...worker, projectId: selectedProject.id }
+          : worker
+      )
+    );
+
+    setNotification('Proyecto actualizado con éxito.');
+    setTimeout(() => setNotification(null), 3000);
+    setShowEditModal(false);
   };
 
   // Eliminar proyecto
-  const handleDeleteProject = async () => {
-    try {
-      await axios.delete(`http://localhost:3000/projects/${selectedProject.id}`);
-      setProjects(projects.filter((project) => project.id !== selectedProject.id)); // Remover proyecto de la lista
-      setNotification('Proyecto eliminado con éxito.');
-      setTimeout(() => setNotification(null), 3000);
-      setShowDeleteModal(false); // Cerrar modal de eliminación
-    } catch (error) {
-      console.error('Error deleting project:', error);
-      setNotification('Error al eliminar el proyecto.');
-    }
+  const handleDeleteProject = () => {
+    setProjects(projects.filter((project) => project.id !== selectedProject.id));
+    setWorkers(workers.map(worker => worker.projectId === selectedProject.id ? { ...worker, projectId: null } : worker)); // Desasignar trabajadores del proyecto eliminado
+    setNotification('Proyecto eliminado con éxito.');
+    setTimeout(() => setNotification(null), 3000);
+    setShowDeleteModal(false);
   };
 
   return (
@@ -142,6 +142,7 @@ const ClientTable = () => {
             <th>Trabajadores Asignados</th>
             <th>Plan</th>
             <th>Tareas</th>
+            <th>Contrato</th> {/* Nueva columna para mostrar el tipo de contrato */}
             <th>Acciones</th>
           </tr>
         </thead>
@@ -153,10 +154,11 @@ const ClientTable = () => {
                 {workers
                   .filter((worker) => worker.projectId === project.id)
                   .map((worker) => worker.name)
-                  .join(', ')}
+                  .join(', ') || 'Sin trabajadores asignados'}
               </td>
               <td>{project.plan}</td>
               <td>{project.taskDescription || 'Sin tarea asignada'}</td>
+              <td>{project.contractType}</td> {/* Mostrar el tipo de contrato */}
               <td>
                 <Button
                   variant="warning"
@@ -164,6 +166,12 @@ const ClientTable = () => {
                     setSelectedProject(project);
                     setNewProjectName(project.name);
                     setNewProjectPlan(project.plan);
+                    setTaskDescription(project.taskDescription || '');
+                    setTaskStatus(project.taskStatus || 'pendiente');
+                    setNewProjectContractType(project.contractType); // Preseleccionar tipo de contrato
+                    setAssignedWorkers(
+                      workers.filter(worker => worker.projectId === project.id).map(worker => worker.id.toString())
+                    );
                     setShowEditModal(true);
                   }}
                 >
@@ -215,6 +223,17 @@ const ClientTable = () => {
             onChange={(e) => setNewProjectPlan(e.target.value)}
             className="form-control"
           />
+          <label htmlFor="newProjectContractType">Tipo de Contrato:</label>
+          <select
+            id="newProjectContractType"
+            value={newProjectContractType}
+            onChange={(e) => setNewProjectContractType(e.target.value)}
+            className="form-control"
+          >
+            <option value="Platino">Platino</option>
+            <option value="Oro">Oro</option>
+            <option value="Diamante">Diamante</option>
+          </select>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowProjectModal(false)}>
@@ -323,6 +342,60 @@ const ClientTable = () => {
             onChange={(e) => setNewProjectPlan(e.target.value)}
             className="form-control"
           />
+
+          {/* Selección del tipo de contrato */}
+          <label htmlFor="editProjectContractType">Tipo de Contrato:</label>
+          <select
+            id="editProjectContractType"
+            value={newProjectContractType}
+            onChange={(e) => setNewProjectContractType(e.target.value)}
+            className="form-control"
+          >
+            <option value="Platino">Platino</option>
+            <option value="Oro">Oro</option>
+            <option value="Diamante">Diamante</option>
+          </select>
+
+          {/* Selección de trabajadores */}
+          <label htmlFor="editWorkersSelect">Seleccionar Trabajadores:</label>
+          <select
+            id="editWorkersSelect"
+            multiple
+            value={assignedWorkers}
+            onChange={(e) =>
+              setAssignedWorkers(Array.from(e.target.selectedOptions, (option) => option.value))
+            }
+            className="form-control"
+          >
+            {workers.map((worker) => (
+              <option key={worker.id} value={worker.id}>
+                {worker.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Input para la descripción de la tarea */}
+          <label htmlFor="editTaskDescription">Descripción de la Tarea:</label>
+          <textarea
+            id="editTaskDescription"
+            value={taskDescription}
+            onChange={(e) => setTaskDescription(e.target.value)}
+            placeholder="Describe la tarea..."
+            className="form-control"
+          />
+
+          {/* Estado de la tarea */}
+          <label htmlFor="editTaskStatus">Estado de la Tarea:</label>
+          <select
+            id="editTaskStatus"
+            value={taskStatus}
+            onChange={(e) => setTaskStatus(e.target.value)}
+            className="form-control"
+          >
+            <option value="pendiente">Pendiente</option>
+            <option value="en progreso">En progreso</option>
+            <option value="completada">Completada</option>
+          </select>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
