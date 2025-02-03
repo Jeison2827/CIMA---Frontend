@@ -1,128 +1,333 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { createClient } from '../../redux/slices/clientSlice';
-import './CreateClient.css'; // Importar los estilos
-import { ToastContainer, toast } from 'react-toastify'; // Importa react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Estilos de react-toastify
-import axios from "axios"
-const CreateUser = () => {
+import axios from 'axios';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Pagination,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Datos iniciales de ejemplo
+const initialUsers = [
+  { id: 1, name: 'Juan Pérez', email: 'juan@example.com', password: '123456', role: 'Admin', address: 'Calle 123', phone: '555-1234' },
+  { id: 2, name: 'Ana García', email: 'ana@example.com', password: 'abcdef', role: 'Worker', address: 'Avenida 456', phone: '555-5678' },
+  { id: 3, name: 'Carlos López', email: 'carlos@example.com', password: 'qwerty', role: 'Client', address: 'Calle 789', phone: '555-9012' },
+];
+
+const roles = ['Admin', 'Worker', 'Client'];
+
+const AdminDashboard = () => {
+  // Estado de usuarios
+  const [users, setUsers] = useState(initialUsers);
+
+  // Estados para el diálogo (dialog)
+  // dialogMode: 'create' | 'edit' | 'delete'
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState('create');
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Estado del formulario (para crear/editar)
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: ""
+    name: '',
+    email: '',
+    password: '',
+    role: '',
+    address: '',
+    phone: '',
   });
 
-  const dispatch = useDispatch();
+  // Paginación
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 5;
+  const paginatedUsers = users.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
 
-  const handleSubmit = (e) => {
+  // Abrir diálogo según la acción
+  const openDialog = (mode, user = null) => {
+    setDialogMode(mode);
+    setSelectedUser(user);
+    if (mode === 'edit' && user) {
+      setFormData({ ...user });
+    } else if (mode === 'create') {
+      setFormData({ name: '', email: '', password: '', role: '', address: '', phone: '' });
+    }
+    setDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setSelectedUser(null);
+  };
+
+  // Manejo del envío del formulario para crear/editar
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validación básica
-    if (formData.name === '' || formData.email === '') {
-      toast.error('El nombre y el email son obligatorios', { position: "top-center" });
+
+    if (!formData.name || !formData.email) {
+      toast.error('Nombre y Email son obligatorios', { position: 'top-center' });
       return;
     }
-    try{
-    dispatch(createClient(formData));
-    toast.success('Cliente creado con éxito', { position: "top-center" });
-    }
-    catch(error){
-      toast.error(error, { position: "top-center" });
-    }
-    
-    
-    // Limpiar formulario
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      role:'',
-    });
-  };
-  
-  
-  function  Prueba (){
-    let data = JSON.stringify({
-        name: FormData.name,
-        email: FormData.email,
-        password: FormData.password,
-        role: FormData.role
-      });
-      
-      let config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3000/developer/users/register',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Authorization': '••••••'
-        },
-        data : data
-      };
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }
-  
-  
-  return (
-    <div className="create-client-container">
-      <ToastContainer />
-      <h1>Crear Usuario</h1>
-      <form onSubmit={handleSubmit} className="create-client-form">
-        <div className="form-group">
-          <label htmlFor="name">Nombre <span className="required">*</span></label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Nombre del Cliente"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-        </div>
+
+    if (dialogMode === 'create') {
+      // Se arma la data y se realiza la petición vía axios
+      try {
+        const data = JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          address: formData.address,
+          phone: formData.phone,
+        });
         
-        <div className="form-group">
-          <label htmlFor="email">Correo</label>
-          <input
-            type="text"
-            id="email"
-            placeholder="Correo Electronico"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          />
-        </div>
+        const config = {
+          method: 'post',
+          maxBodyLength: Infinity,
+          url: 'http://localhost:3000/developer/users/register',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': '••••••' // Ajusta el token o credenciales según corresponda
+          },
+          data: data,
+        };
+        
+        const response = await axios.request(config);
+        // Asumimos que la API retorna un id para el usuario creado
+        const newUser = { ...formData, id: response.data.id || Date.now() };
+        setUsers([...users, newUser]);
+        toast.success('Usuario creado exitosamente', { position: 'top-center' });
+        closeDialog();
+      } catch (error) {
+        console.error(error);
+        toast.error('Error al crear usuario', { position: 'top-center' });
+      }
+    } else if (dialogMode === 'edit') {
+      // Para editar, aquí podrías realizar otra petición PUT/PATCH a tu API.
+      // En este ejemplo se actualiza directamente en el estado.
+      const updatedUsers = users.map((u) =>
+        u.id === selectedUser.id ? { ...formData, id: u.id } : u
+      );
+      setUsers(updatedUsers);
+      toast.success('Usuario actualizado', { position: 'top-center' });
+      closeDialog();
+    }
+  };
 
-        <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            type="text"
-            id="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          />
-        </div>
+  // Manejo de eliminación (en este ejemplo se actualiza el estado; también podrías llamar a la API)
+  const handleDelete = () => {
+    const updatedUsers = users.filter((u) => u.id !== selectedUser.id);
+    setUsers(updatedUsers);
+    toast.success('Usuario eliminado', { position: 'top-center' });
+    closeDialog();
+  };
 
-        <div className="form-group">
-          <label htmlFor="role">Rol <span className="required">*</span></label>
-          <input
-            type="role"
-            id="role"
-            placeholder="Rol"
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          />
-        </div>
+  // Manejo inmediato del cambio de rol en la tabla
+  const handleRoleChange = (userId, newRole) => {
+    const updatedUsers = users.map((u) =>
+      u.id === userId ? { ...u, role: newRole } : u
+    );
+    setUsers(updatedUsers);
+    toast.success('Rol actualizado', { position: 'top-center' });
+  };
 
-        <button type="submit" onClick={Prueba} className="btn-submit">Crear Cliente</button>
-      </form>
-    </div>
+  return (
+    <Box sx={{ p: 4 }}>
+      <ToastContainer />
+      <Typography variant="h4" align="center" gutterBottom>
+        Gestión de Usuarios
+      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={() => openDialog('create')}>
+          Crear Usuario
+        </Button>
+      </Box>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead sx={{ backgroundColor: '#f4f4f4' }}>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Rol</TableCell>
+              <TableCell>Dirección</TableCell>
+              <TableCell>Teléfono</TableCell>
+              <TableCell align="center">Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <FormControl variant="standard" sx={{ minWidth: 120 }}>
+                    <InputLabel id={`role-label-${user.id}`}>Rol</InputLabel>
+                    <Select
+                      labelId={`role-label-${user.id}`}
+                      label="Rol"
+                      value={user.role}
+                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                    >
+                      {roles.map((role) => (
+                        <MenuItem key={role} value={role}>
+                          {role}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </TableCell>
+                <TableCell>{user.address}</TableCell>
+                <TableCell>{user.phone}</TableCell>
+                <TableCell align="center">
+                  <IconButton color="primary" onClick={() => openDialog('edit', user)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => openDialog('delete', user)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+            {paginatedUsers.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  No hay usuarios disponibles.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Pagination
+          count={Math.ceil(users.length / rowsPerPage)}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
+
+      {/* Diálogo para crear/editar */}
+      <Dialog
+        open={dialogOpen && (dialogMode === 'create' || dialogMode === 'edit')}
+        onClose={closeDialog}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{dialogMode === 'create' ? 'Crear Usuario' : 'Editar Usuario'}</DialogTitle>
+        <Box component="form" onSubmit={handleFormSubmit}>
+          <DialogContent dividers>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Nombre"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Email"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Contraseña"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+            <FormControl fullWidth margin="dense" variant="outlined" required>
+              <InputLabel id="role-dialog-label">Rol</InputLabel>
+              <Select
+                labelId="role-dialog-label"
+                label="Rol"
+                value={formData.role}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+              >
+                {roles.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              margin="dense"
+              label="Dirección"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            />
+            <TextField
+              margin="dense"
+              label="Teléfono"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDialog}>Cancelar</Button>
+            <Button type="submit" variant="contained" color="primary">
+              {dialogMode === 'create' ? 'Crear' : 'Guardar'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+
+      {/* Diálogo para confirmar eliminación */}
+      <Dialog open={dialogOpen && dialogMode === 'delete'} onClose={closeDialog}>
+        <DialogTitle>Eliminar Usuario</DialogTitle>
+        <DialogContent dividers>
+          <Typography>
+            ¿Estás seguro de eliminar a <strong>{selectedUser?.name}</strong>?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>Cancelar</Button>
+          <Button onClick={handleDelete} variant="contained" color="error">
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
-export default CreateUser;
+export default AdminDashboard;
