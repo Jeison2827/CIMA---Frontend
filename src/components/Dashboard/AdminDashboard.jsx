@@ -6,7 +6,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupIcon from "@mui/icons-material/Group";
 import SecurityIcon from "@mui/icons-material/Security";
 import { styled } from "@mui/material/styles";
-import ClientTable from "../Client/ClientTable"; // Asegúrate de tener este componente creado
+import UserManagement from "../Client/UserManagement"; // Asegúrate de tener este componente creado
 
 const DashboardContainer = styled("div")(({ theme }) => ({
   padding: "40px",
@@ -54,7 +54,7 @@ const AdminDashboard = () => {
                     <PersonAddIcon fontSize="large" />
                   </IconButton>
                   <Typography variant="h6" style={{ fontWeight: "bold" }}>
-                    Crear Cliente
+                    Gestion De Proyectos
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
                     Agrega nuevos clientes al sistema.
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
               Volver al Dashboard
             </Button>
           </Box>
-          <ClientTable />
+          <UserManagement />
         </>
       )}
 
