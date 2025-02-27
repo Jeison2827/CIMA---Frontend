@@ -7,30 +7,78 @@ import GroupIcon from "@mui/icons-material/Group";
 import SecurityIcon from "@mui/icons-material/Security";
 import { styled } from "@mui/material/styles";
 import UserManagement from "../Client/UserManagement"; // Asegúrate de tener este componente creado
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ProjectsPage from "../Project/pages/ProjectsPage";
+import { ProjectContext, ProjectProvider } from "../../context/ProjectContext";
 
 const DashboardContainer = styled("div")(({ theme }) => ({
   padding: "40px",
-  backgroundColor: "#f4f6f8",
+  background: "linear-gradient(135deg, #f4f6f8 0%, #e9ecef 100%)",
   minHeight: "100vh",
   textAlign: "center",
 }));
 
 const DashboardTitle = styled(Typography)(({ theme }) => ({
-  fontSize: "32px",
-  fontWeight: "bold",
-  color: "#37474f",
-  marginBottom: "20px",
+  fontSize: "36px",
+  fontWeight: "800",
+  color: "#1a237e",
+  marginBottom: "30px",
+  position: "relative",
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    bottom: "-10px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "60px",
+    height: "4px",
+    background: "linear-gradient(90deg, #1a237e 0%, #3949ab 100%)",
+    borderRadius: "2px",
+  }
 }));
 
 const CustomCard = styled(Card)(({ theme }) => ({
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+  height: "100%",
+  borderRadius: "16px",
+  background: "white",
+  transition: "all 0.3s ease-in-out",
+  border: "1px solid rgba(0, 0, 0, 0.05)",
   "&:hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.15)",
+    transform: "translateY(-8px)",
+    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.08)",
+    background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
   },
-  textDecoration: "none",
-  color: "inherit",
-  cursor: "pointer",
+  "& .MuiCardContent-root": {
+    padding: "32px 24px",
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "16px",
+  }
+}));
+
+const IconWrapper = styled("div")(({ theme }) => ({
+  background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+  borderRadius: "50%",
+  padding: "20px",
+  marginBottom: "8px",
+  "& .MuiSvgIcon-root": {
+    fontSize: "40px",
+    color: "#1a237e",
+  }
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  background: "linear-gradient(90deg, #1a237e 0%, #3949ab 100%)",
+  color: "white",
+  padding: "10px 24px",
+  borderRadius: "8px",
+  textTransform: "none",
+  fontWeight: "600",
+  "&:hover": {
+    background: "linear-gradient(90deg, #0d47a1 0%, #1a237e 100%)",
+  }
 }));
 
 const AdminDashboard = () => {
@@ -45,19 +93,27 @@ const AdminDashboard = () => {
           <DashboardTitle variant="h4">
             Panel de Administración
           </DashboardTitle>
-          <Grid container spacing={3} justifyContent="center">
+          <Grid container spacing={4} justifyContent="center">
             {/* Crear Cliente */}
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("createClient")}>
-                <CardContent style={{ textAlign: "center" }}>
-                  <IconButton color="primary">
-                    <PersonAddIcon fontSize="large" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ fontWeight: "bold" }}>
-                    Gestion De Proyectos
+                <CardContent>
+                  <IconWrapper>
+                    <PersonAddIcon />
+                  </IconWrapper>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: "700",
+                    color: "#1a237e",
+                    fontSize: "1.25rem",
+                    marginBottom: 1
+                  }}>
+                    Gestión De Proyectos
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Agrega nuevos clientes al sistema.
+                  <Typography variant="body1" sx={{
+                    color: "#546e7a",
+                    lineHeight: 1.6
+                  }}>
+                    Agrega y administra nuevos proyectos en el sistema
                   </Typography>
                 </CardContent>
               </CustomCard>
@@ -66,15 +122,23 @@ const AdminDashboard = () => {
             {/* Gestionar Clientes */}
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("clients")}>
-                <CardContent style={{ textAlign: "center" }}>
-                  <IconButton color="primary">
-                    <GroupIcon fontSize="large" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ fontWeight: "bold" }}>
+                <CardContent>
+                  <IconWrapper>
+                    <GroupIcon />
+                  </IconWrapper>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: "700",
+                    color: "#1a237e",
+                    fontSize: "1.25rem",
+                    marginBottom: 1
+                  }}>
                     Gestionar Clientes
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Administra la información de los clientes.
+                  <Typography variant="body1" sx={{
+                    color: "#546e7a",
+                    lineHeight: 1.6
+                  }}>
+                    Administra la información de los clientes
                   </Typography>
                 </CardContent>
               </CustomCard>
@@ -83,15 +147,23 @@ const AdminDashboard = () => {
             {/* Gestionar Roles */}
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("roles")}>
-                <CardContent style={{ textAlign: "center" }}>
-                  <IconButton color="primary">
-                    <SecurityIcon fontSize="large" />
-                  </IconButton>
-                  <Typography variant="h6" style={{ fontWeight: "bold" }}>
+                <CardContent>
+                  <IconWrapper>
+                    <SecurityIcon />
+                  </IconWrapper>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: "700",
+                    color: "#1a237e",
+                    fontSize: "1.25rem",
+                    marginBottom: 1
+                  }}>
                     Gestionar Roles
                   </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Asigna y gestiona roles de usuario.
+                  <Typography variant="body1" sx={{
+                    color: "#546e7a",
+                    lineHeight: 1.6
+                  }}>
+                    Asigna y gestiona roles de usuario
                   </Typography>
                 </CardContent>
               </CustomCard>
@@ -100,41 +172,34 @@ const AdminDashboard = () => {
         </>
       )}
 
+      {selectedView !== "dashboard" && (
+        <Box sx={{ mb: 3, display: "flex", justifyContent: "flex-start" }}>
+          <StyledButton
+            variant="contained"
+            onClick={() => setSelectedView("dashboard")}
+            startIcon={<ArrowBackIcon />}
+          >
+            Volver al Dashboard
+          </StyledButton>
+        </Box>
+      )}
+
       {selectedView === "clients" && (
         <>
-          <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-start" }}>
-            <Button variant="outlined" onClick={() => setSelectedView("dashboard")}>
-              Volver al Dashboard
-            </Button>
-          </Box>
           <UserManagement />
         </>
       )}
 
       {selectedView === "createClient" && (
         <>
-          <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-start" }}>
-            <Button variant="outlined" onClick={() => setSelectedView("dashboard")}>
-              Volver al Dashboard
-            </Button>
-          </Box>
-          {/* Aquí podrías incluir el componente o la vista para crear clientes.
-              Por ejemplo, si tienes un componente CreateUser o un modal similar, lo integras aquí. */}
-          <Typography variant="h5" sx={{ mt: 2 }}>
-            Vista de Crear Cliente
-          </Typography>
-          {/* ... */}
+          <ProjectProvider>
+            <ProjectsPage />
+          </ProjectProvider>
         </>
       )}
 
       {selectedView === "roles" && (
         <>
-          <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-start" }}>
-            <Button variant="outlined" onClick={() => setSelectedView("dashboard")}>
-              Volver al Dashboard
-            </Button>
-          </Box>
-          {/* Aquí integras el componente o vista de gestión de roles */}
           <Typography variant="h5" sx={{ mt: 2 }}>
             Vista de Gestión de Roles
           </Typography>
