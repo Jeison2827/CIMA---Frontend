@@ -21,8 +21,11 @@ const StatCard = ({ title, value, icon, color }) => (
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      bgcolor: `${color}.light`,
-      color: `${color}.dark`
+      // Fondo neutro y borde con el color indicado
+      bgcolor: 'background.paper',
+      border: '2px solid',
+      borderColor: `${color}.main`,
+      color: 'text.primary'
     }}
   >
     <Box display="flex" alignItems="center" mb={1}>
@@ -62,7 +65,7 @@ const ProjectStats = ({ stats }) => {
         <StatCard
           title="Total Proyectos"
           value={total}
-          icon={<AssignmentIcon />}
+          icon={<AssignmentIcon fontSize="large" />}
           color="primary"
         />
       </Grid>
@@ -70,7 +73,7 @@ const ProjectStats = ({ stats }) => {
         <StatCard
           title="Completados"
           value={completed}
-          icon={<CheckCircleIcon />}
+          icon={<CheckCircleIcon fontSize="large" />}
           color="success"
         />
       </Grid>
@@ -78,7 +81,7 @@ const ProjectStats = ({ stats }) => {
         <StatCard
           title="Pendientes"
           value={pending}
-          icon={<PendingIcon />}
+          icon={<PendingIcon fontSize="large" />}
           color="warning"
         />
       </Grid>
@@ -86,7 +89,7 @@ const ProjectStats = ({ stats }) => {
         <StatCard
           title="En Progreso"
           value={inProgress}
-          icon={<TimelineIcon />}
+          icon={<TimelineIcon fontSize="large" />}
           color="info"
         />
       </Grid>
@@ -94,4 +97,4 @@ const ProjectStats = ({ stats }) => {
   );
 };
 
-export default ProjectStats; 
+export default ProjectStats;

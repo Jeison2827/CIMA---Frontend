@@ -1,5 +1,5 @@
 // src/pages/projects/ProjectsPage.js
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -34,35 +34,66 @@ const ProjectsPage = () => {
   
   const {
     projects,
+    filteredProjects,
     projectStats,
     loading,
     error,
     notification,
     setNotification,
     createProject,
+    deleteProject,
+    fetchProjects,
     updateProject,
-    deleteProject
+    showNotification
   } = projectContext;
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [openEditForm, setOpenEditForm] = useState(false);
+
+  // Asegurarse de cargar los proyectos cuando el componente se monta
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleCreateProject = async (projectData) => {
     try {
       await createProject(projectData);
+      fetchProjects(); // Recargar la lista después de crear
       setOpenForm(false);
     } catch (error) {
-      console.error('Error creating project:', error);
+      console.error('Error al crear proyecto:', error);
     }
   };
 
-  const handleUpdateProject = async (projectData) => {
+  const handleEdit = (project) => {
+    setSelectedProject(project);
+    setOpenEditForm(true);
+  };
+
+  const handleUpdateProject = async (formData) => {
     try {
+      if (!selectedProject?.id) {
+        showNotification('No se ha seleccionado ningún proyecto para actualizar', 'error');
+        return;
+      }
+
+      console.log('Actualizando proyecto:', selectedProject.id, formData);
+
+      // Formatear los datos según lo requiere el backend
+      const projectData = {
+        clientId: Number(formData.clientId),
+        projectName: formData.projectName,
+        description: formData.description || '',
+        status: formData.status
+      };
+
       await updateProject(selectedProject.id, projectData);
-      setOpenForm(false);
-      setSelectedProject(null);
+      setOpenEditForm(false);
+      showNotification('Proyecto actualizado exitosamente', 'success');
     } catch (error) {
-      console.error('Error updating project:', error);
+      console.error('Error en la actualización:', error);
+      showNotification('Error al actualizar el proyecto', 'error');
     }
   };
 
@@ -107,12 +138,9 @@ const ProjectsPage = () => {
             <Grid item xs={12}>
               <Paper>
                 <ProjectList
-                  projects={projects}
+                  projects={filteredProjects}
                   loading={loading}
-                  onEdit={project => {
-                    setSelectedProject(project);
-                    setOpenForm(true);
-                  }}
+                  onEdit={handleEdit}
                   onDelete={handleDeleteProject}
                 />
               </Paper>
@@ -125,7 +153,16 @@ const ProjectsPage = () => {
               setOpenForm(false);
               setSelectedProject(null);
             }}
-            onSubmit={selectedProject ? handleUpdateProject : handleCreateProject}
+            onSubmit={handleCreateProject}
+          />
+
+          <ProjectForm
+            open={openEditForm}
+            onClose={() => {
+              setOpenEditForm(false);
+              setSelectedProject(null);
+            }}
+            onSubmit={handleUpdateProject}
             project={selectedProject}
           />
 

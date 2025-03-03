@@ -1,6 +1,5 @@
 // src/pages/projects/components/ProjectList.js
-import React, { useContext } from 'react';
-import { ProjectContext } from '../../../context/ProjectContext';
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -25,11 +24,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import StatusChip from '../StatusChip';
 
-const ProjectList = () => {
-  const { projects, removeProject, loading } = useContext(ProjectContext);
+const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [searchTerm, setSearchTerm] = React.useState('');
   const [openDialog, setOpenDialog] = React.useState(false);
   const [projectToDelete, setProjectToDelete] = React.useState(null);
@@ -58,12 +57,45 @@ const ProjectList = () => {
 
   const handleDeleteConfirm = () => {
     if (projectToDelete) {
-      removeProject(projectToDelete.id);
+      onDelete(projectToDelete.id);
     }
     setOpenDialog(false);
   };
 
-  // Asegurarse de que projects es un array antes de filtrar
+  const handleEdit = (project) => {
+    console.log('Enviando proyecto a editar:', project);
+    
+    // Crear una copia del proyecto con id si no existe
+    const projectToEdit = {
+      ...project,
+      id: project.id || project.projectId // Usar projectId como fallback
+    };
+    
+    console.log('Proyecto normalizado para editar:', projectToEdit);
+    
+    if (!projectToEdit.id) {
+      console.error('Proyecto inválido para editar, sin ID:', project);
+      return;
+    }
+    
+    onEdit(projectToEdit);
+  };
+
+  const handleDelete = async (project) => {
+    try {
+      // Usar projectId si id no está disponible
+      const idToDelete = project.id || project.projectId;
+      if (!idToDelete) {
+        console.error('No se puede eliminar proyecto sin ID:', project);
+        return;
+      }
+      await onDelete(idToDelete);
+    } catch (error) {
+      console.error('Error al eliminar el proyecto:', error);
+    }
+  };
+
+  // Filtrar y ordenar proyectos
   const filteredProjects = projects && projects.length > 0 
     ? projects
         .filter((project) =>
@@ -80,6 +112,15 @@ const ProjectList = () => {
             : String(b[orderBy]).localeCompare(String(a[orderBy]));
         })
     : [];
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'Pending': return 'Pendiente';
+      case 'In Progress': return 'En Progreso';
+      case 'Completed': return 'Completado';
+      default: return status;
+    }
+  };
 
   if (loading) {
     return (
@@ -188,18 +229,10 @@ const ProjectList = () => {
                     <TableCell>{project.projectName}</TableCell>
                     <TableCell>{project.description}</TableCell>
                     <TableCell>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{
-                          backgroundColor: project.status === 'Completed' ? 'success.main' : 'warning.main',
-                          '&:hover': { 
-                            backgroundColor: project.status === 'Completed' ? 'success.dark' : 'warning.dark' 
-                          }
-                        }}
-                      >
-                        {project.status}
-                      </Button>
+                      <StatusChip
+                        label={getStatusLabel(project.status)}
+                        status={project.status}
+                      />
                     </TableCell>
                     <TableCell>
                       <Tooltip title="Editar proyecto">
@@ -208,6 +241,7 @@ const ProjectList = () => {
                           color="primary" 
                           size="small"
                           sx={{ mr: 1 }}
+                          onClick={() => handleEdit(project)}
                         >
                           <EditIcon fontSize="small" />
                         </Button>
@@ -217,7 +251,7 @@ const ProjectList = () => {
                           variant="contained" 
                           color="error"
                           size="small"
-                          onClick={() => handleDeleteClick(project)}
+                          onClick={() => handleDelete(project)}
                         >
                           <DeleteIcon fontSize="small" />
                         </Button>
