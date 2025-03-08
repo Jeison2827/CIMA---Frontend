@@ -10,7 +10,9 @@ import UserManagement from "../Client/UserManagement"; // Asegúrate de tener es
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ProjectsPage from "../Project/pages/ProjectsPage";
 import { ProjectContext, ProjectProvider } from "../../context/ProjectContext";
-
+// Import TaskList component
+import TaskList from "../TaskTable/TaskList";
+import TaskManagement from "../TaskManagement/TaskManagement";
 const DashboardContainer = styled("div")(({ theme }) => ({
   padding: "40px",
   background: "linear-gradient(135deg, #f4f6f8 0%, #e9ecef 100%)",
@@ -157,7 +159,7 @@ const AdminDashboard = () => {
                     fontSize: "1.25rem",
                     marginBottom: 1
                   }}>
-                    Gestionar Roles
+                    Gestionar Tareas
                   </Typography>
                   <Typography variant="body1" sx={{
                     color: "#546e7a",
@@ -200,12 +202,13 @@ const AdminDashboard = () => {
 
       {selectedView === "roles" && (
         <>
-          <Typography variant="h5" sx={{ mt: 2 }}>
-            Vista de Gestión de Roles
+          <Typography variant="h5" sx={{ mt: 2, mb: 4 }}>
+            Gestión de Tareas
           </Typography>
-          {/* ... */}
+          <TaskManagement />
         </>
       )}
+
     </DashboardContainer>
   );
 };
