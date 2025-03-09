@@ -78,7 +78,7 @@ const ProjectsPage = () => {
         return;
       }
 
-      console.log('Actualizando proyecto:', selectedProject.id, formData);
+      //console.log.log('Actualizando proyecto:', selectedProject.id, formData);
 
       // Formatear los datos según lo requiere el backend
       const projectData = {

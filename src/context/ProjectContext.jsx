@@ -37,18 +37,14 @@ export const ProjectProvider = ({ children }) => {
     (config) => {
       // Verificar que el token existe y tiene el formato correcto
       if (accessToken) {
-        ////console.log('Token siendo enviado:', accessToken);
+        //console.log('Token siendo enviado:', accessToken);
         config.headers['Authorization'] = `Bearer ${accessToken}`;
         config.headers['accessToken'] = accessToken;
       } else {
         console.warn('No hay token disponible para la petición');
       }
-      // Log de la configuración final
-      console.log('Request config:', {
-        url: config.url,
-        method: config.method,
-        headers: config.headers
-      });
+      // ¡Log de la configuración final
+      
       return config;
     },
     (error) => {
@@ -60,20 +56,10 @@ export const ProjectProvider = ({ children }) => {
   // Interceptor para manejar respuestas
   axiosInstance.interceptors.response.use(
     (response) => {
-      console.log('Respuesta exitosa:', {
-        url: response.config.url,
-        status: response.status,
-        data: response.data
-      });
+      
       return response;
     },
     (error) => {
-      console.error('Error en la respuesta:', {
-        url: error.config?.url,
-        status: error.response?.status,
-        data: error.response?.data,
-        headers: error.config?.headers
-      });
       
       if (error.response?.status === 401) {
         showNotification('Error de autenticación. Verificando sesión...', 'error');
@@ -89,7 +75,7 @@ export const ProjectProvider = ({ children }) => {
       return;
     }
     try {
-      //console.log('Obteniendo estadísticas con token:', accessToken);
+      ////console.log.log('Obteniendo estadísticas con token:', accessToken);
       const response = await axiosInstance.get('/stats');
       if (response.data.success) {
         setProjectStats(response.data.stats);
@@ -134,9 +120,9 @@ export const ProjectProvider = ({ children }) => {
 
   // Efecto para cargar datos iniciales
   useEffect(() => {
-    ////console.log('Estado de autenticación:', { auth, accessToken });
+    //////console.log.log('Estado de autenticación:', { auth, accessToken });
     if (accessToken) {
-      ////console.log('Iniciando carga de datos con token:', accessToken);
+      //////console.log.log('Iniciando carga de datos con token:', accessToken);
       fetchProjects();
       fetchProjectStats();
     }
@@ -249,7 +235,7 @@ export const ProjectProvider = ({ children }) => {
         baseURL: 'http://localhost:3000/developer/projects'
       });
       
-      console.log('Respuesta de clientes:', response.data);
+      //console.log.log('Respuesta de clientes:', response.data);
       
       // Verificar la estructura de la respuesta
       if (!response.data || !response.data.clients) {
@@ -294,7 +280,7 @@ export const ProjectProvider = ({ children }) => {
         }
       });
 
-      console.log('Respuesta de actualización:', response.data);
+      //console.log.log('Respuesta de actualización:', response.data);
 
       if (response.data.success) {
         await fetchProjects(); // Recargar la lista completa

@@ -63,7 +63,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
   };
 
   const handleEdit = (project) => {
-    console.log('Enviando proyecto a editar:', project);
+    //console.log.log('Enviando proyecto a editar:', project);
     
     // Crear una copia del proyecto con id si no existe
     const projectToEdit = {
@@ -71,7 +71,7 @@ const ProjectList = ({ projects = [], loading, onEdit, onDelete }) => {
       id: project.id || project.projectId // Usar projectId como fallback
     };
     
-    console.log('Proyecto normalizado para editar:', projectToEdit);
+    //console.log.log('Proyecto normalizado para editar:', projectToEdit);
     
     if (!projectToEdit.id) {
       console.error('Proyecto inválido para editar, sin ID:', project);

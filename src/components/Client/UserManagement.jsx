@@ -204,7 +204,7 @@ const UserManagement = () => {
 
   // Verifica e imprime el token en consola
   useEffect(() => {
-    console.log('Token desde Redux:', token);
+    ///console.log.log('Token desde Redux:', token);
   }, [token]);
 
   // Obtener todos los usuarios desde la API cuando se monte el componente
@@ -214,8 +214,7 @@ const UserManagement = () => {
         const response = await axios.get('http://localhost:3000/developer/users/', {
           headers: {
             'Content-Type': 'application/json',
-            // Enviar el token en el header "accesstoken" (sin "Bearer")
-            'accesstoken': token
+            'accesstoken': localStorage.getItem('accessToken')
           }
         });
         setUsers(response.data);

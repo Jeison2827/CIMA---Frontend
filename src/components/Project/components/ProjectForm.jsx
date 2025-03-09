@@ -96,7 +96,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         setLoading(true);
         setError(null);
         const clientsData = await getAllClients();
-        console.log('Clientes obtenidos:', clientsData);
+        //console.log.log('Clientes obtenidos:', clientsData);
         setClients(clientsData || []);
       } catch (error) {
         console.error('Error al cargar clientes:', error);

@@ -16,10 +16,10 @@ const Login = () => {
     const result = await dispatch(login({ email, password }));  
     
     if (login.fulfilled.match(result)) {  
-      console.log("Redirigiendo al dashboard...");  
+      //console.log.log("Redirigiendo al dashboard...");  
       navigate('/dashboard');  
     } else {  
-      console.log("Error en login:", error);  
+      //console.log.log("Error en login:", error);  
     }  
   };  
 

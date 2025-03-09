@@ -7,17 +7,17 @@ const ProtectedRoute = ({ roles, children }) => {
 
   // Verificación de autenticación
   if (!user) {
-    console.log('Usuario no autenticado, redirigiendo a /login');
+    ////console.log.log('Usuario no autenticado, redirigiendo a /login');
     return <Navigate to="/login" />;
   }
 
   // Verificación de rol
   if (roles && !roles.includes(user.role)) {
-    console.log('Usuario sin rol adecuado, redirigiendo a /unauthorized');
+    ///console.log.log('Usuario sin rol adecuado, redirigiendo a /unauthorized');
     return <Navigate to="/unauthorized" />;
   }
 
-  console.log('Usuario autenticado con rol adecuado:', user.role);
+  ///console.log.log('Usuario autenticado con rol adecuado:', user.role);
 
   // Renderiza el componente hijo directamente
   return children;
