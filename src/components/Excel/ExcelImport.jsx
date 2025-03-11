@@ -34,57 +34,74 @@ import {
   Download as DownloadIcon,
   FileCopy as FileIcon,
   FolderOpen as ProjectIcon,
+  InsertDriveFile as DocumentIcon,
+  CloudQueue as CloudIcon,
 } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
+import { Grid, Stack, Chip } from '@mui/material';
 
 const DropzoneArea = styled('div')(({ theme }) => ({
-  border: `2px dashed ${theme.palette.primary.main}`,
-  borderRadius: theme.shape.borderRadius * 2,
+  border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
+  borderRadius: theme.shape.borderRadius * 3,
   padding: theme.spacing(6),
   textAlign: 'center',
   cursor: 'pointer',
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: alpha(theme.palette.primary.main, 0.02),
   transition: 'all 0.3s ease',
+  backdropFilter: 'blur(8px)',
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.primary.dark,
+    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+    borderColor: theme.palette.primary.main,
     transform: 'translateY(-2px)',
-    boxShadow: theme.shadows[4],
+    boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.12)}`,
+  },
+}));
+
+const FileCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius * 2,
+  transition: 'all 0.3s ease',
+  border: '1px solid',
+  borderColor: alpha(theme.palette.divider, 0.1),
+  background: alpha(theme.palette.background.paper, 0.8),
+  backdropFilter: 'blur(8px)',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: `0 12px 32px ${alpha(theme.palette.primary.main, 0.08)}`,
   },
 }));
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  backgroundColor: '#ffffff',
+  backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius * 2,
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
   overflow: 'hidden',
+  border: '1px solid',
+  borderColor: theme.palette.divider,
   '& .MuiTableCell-head': {
     backgroundColor: theme.palette.primary.dark,
-    color: '#ffffff',
+    color: theme.palette.common.white,
     fontWeight: 600,
     fontSize: '0.95rem',
     padding: theme.spacing(2),
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
   },
   '& .MuiTableRow-root': {
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s ease',
+    borderBottom: `1px solid ${theme.palette.divider}`,
     '&:hover': {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: alpha(theme.palette.primary.main, 0.04),
       transform: 'translateY(-1px)',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
     },
   },
   '& .file-name': {
     fontWeight: 500,
     color: theme.palette.text.primary,
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(1),
   },
   '& .file-info': {
     color: theme.palette.text.secondary,
-  },
-  '& .MuiTableCell-body': {
-    padding: theme.spacing(2),
+    fontSize: '0.875rem',
   },
 }));
 

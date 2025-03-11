@@ -48,8 +48,8 @@ const Dashboard = () => {
         <ul className="sidebar-menu">
           {user.role === 'Admin' && (
             <>
-              <li onClick={() => changeView('adminDashboard')}><i className="fas fa-home"></i> Home</li>
-              <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Documentos</li>
+              <li onClick={() => changeView('adminDashboard')}><i className="fas fa-home"></i> Inicio</li>
+              <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Gestor de Documentos              </li>
               <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte</li>
               <li onClick={() => changeView('faqAdmin')}><i className="fas fa-question-circle"></i> Gestionar FAQs</li>
@@ -58,7 +58,7 @@ const Dashboard = () => {
           {user.role === 'Worker' && (
             <>
               <li onClick={() => changeView('workerProjects')}><i className="fas fa-project-diagram"></i> Proyectos</li>
-              <li onClick={() => changeView('workerTasks')}><i className="fas fa-tasks"></i> Tareas</li>
+              
             </>
           )}
           {user.role === 'Client' && (
@@ -75,7 +75,7 @@ const Dashboard = () => {
 
       <main className="dashboard-main">
         <header className="dashboard-header">
-          <h1>Bienvenido, {user.name}</h1>
+ 
         </header>
 
         <section className="dashboard-content">
