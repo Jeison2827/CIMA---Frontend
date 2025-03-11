@@ -1,127 +1,75 @@
 .project-status-container {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 30px;
   background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   font-family: 'Roboto', sans-serif;
   color: #333;
-  text-align: center;
 }
 
-h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #222;
+.search-input {
+  background-color: #fff;
+  border-radius: 8px;
 }
 
-.edit-project-name {
+.search-input .MuiOutlinedInput-root {
+  transition: all 0.3s ease;
+}
+
+.search-input .MuiOutlinedInput-root:hover {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+.search-input .MuiOutlinedInput-root.Mui-focused {
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.CircularProgressbar {
   width: 100%;
-  font-size: 22px;
-  padding: 8px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  max-width: 200px;
+  margin: 0 auto;
 }
 
-.project-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.CircularProgressbar-path {
+  stroke-linecap: round;
 }
 
-.edit-button,
-.save-button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
+.CircularProgressbar-trail {
+  stroke: #d6d6d6;
+}
+
+.CircularProgressbar-text {
   font-size: 16px;
+  font-weight: 500;
 }
 
-.edit-button:hover,
-.save-button:hover {
-  background-color: #45a049;
+.view-button:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
-.progress-circle {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 30px auto;
+.MuiTableCell-root {
+  padding: 16px;
 }
 
-ul.milestones-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
+.MuiTableRow-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
-.milestones-list li {
-  display: flex;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #ddd;
-  font-size: 18px;
-  color: #555;
+.MuiChip-root {
+  font-weight: 500;
 }
 
-.milestones-list li.completed {
-  background-color: #e8f5e9;
-  color: #4caf50;
-  font-weight: bold;
+.MuiTypography-caption {
+  display: block;
+  color: #666;
 }
 
-.milestones-list li.in-progress {
-  background-color: #e3f2fd;
-  color: #2196f3;
-}
-
-.milestones-list li.pending {
-  background-color: #fff3e0;
-  color: #ff9800;
-}
-
-.milestones-list li:last-child {
-  border-bottom: none;
-}
-
-.icon-completed {
-  color: #4caf50;
-  margin-right: 10px;
-  font-size: 20px;
-}
-
-.icon-in-progress {
-  color: #2196f3;
-  margin-right: 10px;
-  font-size: 20px;
-}
-
-.icon-pending {
-  color: #ff9800;
-  margin-right: 10px;
-  font-size: 20px;
-}
-
-.milestones-list input {
-  width: 80%;
-  padding: 8px;
-  margin-left: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.milestones-list select {
-  margin-left: 10px;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+.MuiTableHead-root .MuiTableRow-root {
   background-color: #f5f5f5;
-  font-size: 16px;
+}
+
+.MuiTableCell-head {
+  font-weight: 600 !important;
+  color: #333;
 }
