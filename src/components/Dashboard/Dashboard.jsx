@@ -49,7 +49,7 @@ const Dashboard = () => {
           {user.role === 'Admin' && (
             <>
               <li onClick={() => changeView('adminDashboard')}><i className="fas fa-home"></i> Home</li>
-              <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Importar Excel</li>
+              <li onClick={() => changeView('excelImport')}><i className="fas fa-file-excel"></i> Documentos</li>
               <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte</li>
               <li onClick={() => changeView('faqAdmin')}><i className="fas fa-question-circle"></i> Gestionar FAQs</li>
