@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
 import {
   Box,
@@ -12,7 +13,6 @@ import {
   Typography,
   Button,
   Chip,
-  IconButton,
   LinearProgress,
   Alert,
   Fade,
@@ -24,48 +24,63 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-} from '@mui/material';
-import { Assignment } from '@mui/icons-material';
-import {
-  Assignment as ProjectIcon,
-  Timeline as TimelineIcon,
-  Update as UpdateIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import {
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Modal,
+  Tooltip,
+  IconButton,
+  Divider,
 } from '@mui/material';
+import {
+  Assignment as ProjectIcon,
+  Timeline as TimelineIcon,
+  Update as UpdateIcon,
+  Info as InfoIcon,
+  Task as TaskIcon,
+  CalendarToday as CalendarIcon,
+  Description as DescriptionIcon,
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  transition: 'transform 0.3s, box-shadow 0.3s',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  position: 'relative',
+  overflow: 'visible',
   '&:hover': {
-    transform: 'translateY(-4px)',
+    transform: 'translateY(-8px)',
     boxShadow: theme.shadows[8],
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '4px',
+    background: theme.palette.primary.main,
+    borderRadius: '4px 4px 0 0',
   },
 }));
 
 const StatusChip = styled(Chip)(({ theme, status }) => {
   const getColor = () => {
     switch (status?.toLowerCase()) {
-      case 'en progreso':
-        return { bg: '#E3F2FD', color: '#1976D2' };
-      case 'completado':
-        return { bg: '#E8F5E9', color: '#2E7D32' };
-      case 'en espera':
-        return { bg: '#FFF3E0', color: '#E65100' };
+      case 'in progress':
+        return { bg: theme.palette.info.light, color: theme.palette.info.dark };
+      case 'completed':
+        return { bg: theme.palette.success.light, color: theme.palette.success.dark };
+      case 'pending':
+        return { bg: theme.palette.warning.light, color: theme.palette.warning.dark };
       default:
-        return { bg: '#F5F5F5', color: '#757575' };
+        return { bg: theme.palette.grey[200], color: theme.palette.grey[700] };
     }
   };
   const { bg, color } = getColor();
@@ -79,19 +94,57 @@ const StatusChip = styled(Chip)(({ theme, status }) => {
   };
 });
 
-const TaskModal = styled(Modal)(({ theme }) => ({
+// Update the StyledModal component
+const StyledModal = styled(Modal)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   '& .MuiPaper-root': {
-    width: '80%',
-    maxHeight: '80vh',
-    overflow: 'auto',
-    padding: theme.spacing(4),
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[5],
+    width: '90%',
+    maxWidth: 1200,
+    maxHeight: '90vh',
+    overflow: 'hidden',
+    borderRadius: theme.shape.borderRadius * 2,
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+    background: theme.palette.background.paper,
+    animation: 'modalFadeIn 0.3s ease-out',
   },
+  '@keyframes modalFadeIn': {
+    from: {
+      opacity: 0,
+      transform: 'scale(0.95)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'scale(1)',
+    },
+  },
+}));
+
+// Add this new styled component
+const ModalHeader = styled(Box)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+  padding: theme.spacing(3),
+  color: theme.palette.primary.contrastText,
+  position: 'relative',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '4px',
+    background: 'rgba(255, 255, 255, 0.1)',
+  },
+}));
+
+const ProjectMetadata = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  color: theme.palette.text.secondary,
+  fontSize: '0.875rem',
+  marginTop: theme.spacing(2),
 }));
 
 const WorkerProjects = () => {
@@ -110,59 +163,50 @@ const WorkerProjects = () => {
   const navigate = useNavigate();
   const { accessToken } = useSelector((state) => state.auth);
 
-  const renderProjectCard = (project) => {
-    console.log('Rendering project:', project);
-    return (
-      <StyledCard>
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+  const renderProjectCard = (project) => (
+    <StyledCard>
+      <CardContent sx={{ flexGrow: 1, p: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ProjectIcon color="primary" />
             <Typography variant="h6" component="h2">
               {project.projectName}
             </Typography>
           </Box>
-          
           <StatusChip
             status={project.status}
             label={project.status}
             size="small"
-            sx={{ mb: 2 }}
           />
+        </Box>
 
-          <Typography variant="body2" color="text.secondary" paragraph>
-            {project.description || 'Sin descripción disponible'}
+        <Divider sx={{ my: 2 }} />
+
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 60 }}>
+          <DescriptionIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'text-bottom' }} />
+          {project.description || 'Sin descripción disponible'}
+        </Typography>
+
+        <ProjectMetadata>
+          <CalendarIcon fontSize="small" />
+          <Typography variant="body2">
+            Inicio: {new Date(project.startDate).toLocaleDateString()}
           </Typography>
+        </ProjectMetadata>
+      </CardContent>
 
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              Fecha de inicio: {new Date(project.startDate).toLocaleDateString()}
-            </Typography>
-          </Box>
-        </CardContent>
-
-        <CardActions sx={{ p: 2, pt: 0 }}>
- 
-          <Button
-            size="small"
-            startIcon={<Assignment />}
-            onClick={() => fetchProjectTasks(project.projectId)}
-          >
-            Ver Tareas
-          </Button>
-          <Button
-            size="small"
-            startIcon={<UpdateIcon />}
-            onClick={() => {
-              setSelectedProject(project);
-              setOpenDialog(true);
-            }}
-          >
-            Actualizar Estado
-          </Button>
-        </CardActions>
-      </StyledCard>
-    );
-  };
+      <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<TaskIcon />}
+          onClick={() => fetchProjectTasks(project.projectId)}
+        >
+          Ver Tareas
+        </Button>
+      </CardActions>
+    </StyledCard>
+  );
 
     const fetchProjects = async () => {
       try {
@@ -263,7 +307,12 @@ const WorkerProjects = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ 
+          fontWeight: 700,
+          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
           Mis Proyectos
         </Typography>
         <Typography variant="subtitle1" color="text.secondary">
@@ -291,26 +340,50 @@ const WorkerProjects = () => {
         {/* ... Dialog content ... */}
       </Dialog>
 
-      <TaskModal open={tasksModalOpen} onClose={handleCloseTasksModal}>
-        <Paper>
-          <Box sx={{ p: 3 }}>
-            <Typography variant="h6" component="h2" gutterBottom>
-              Tareas del Proyecto
-            </Typography>
-            <TableContainer>
+      // Update the modal content in the return statement
+      <StyledModal open={tasksModalOpen} onClose={handleCloseTasksModal}>
+        <Paper sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+          <ModalHeader>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <TaskIcon sx={{ fontSize: 28 }} />
+              <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
+                Tareas del Proyecto
+              </Typography>
+            </Box>
+          </ModalHeader>
+
+          <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+            <TableContainer sx={{ 
+              borderRadius: 1,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              '& .MuiTable-root': {
+                borderCollapse: 'separate',
+                borderSpacing: '0 8px',
+              },
+            }}>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Descripción</TableCell>
-                    <TableCell>Estado</TableCell>
-                    <TableCell>Fecha de Creación</TableCell>
-                    <TableCell>Última Actualización</TableCell>
-                    <TableCell>Acciones</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Descripción</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Estado</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Fecha de Creación</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Última Actualización</TableCell>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>Acciones</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {tasks.map((task) => (
-                    <TableRow key={task.taskId || task._id}>
+                    <TableRow 
+                      key={task.taskId || task._id}
+                      sx={{
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                        },
+                      }}
+                    >
                       <TableCell>{task.description}</TableCell>
                       <TableCell>
                         <StatusChip status={task.status} label={task.status} />
@@ -322,38 +395,75 @@ const WorkerProjects = () => {
                         {new Date(task.updatedAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <Button
-                          size="small"
-                          startIcon={<UpdateIcon />}
-                          onClick={() => {
-                            setSelectedTask(task);
-                            setNewTaskStatus(task.status);
-                            setTaskUpdateDialog(true);
-                          }}
-                        >
-                          Actualizar Estado
-                        </Button>
+                        <Tooltip title="Actualizar Estado" arrow>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            color="primary"
+                            startIcon={<UpdateIcon />}
+                            onClick={() => {
+                              setSelectedTask(task);
+                              setNewTaskStatus(task.status);
+                              setTaskUpdateDialog(true);
+                            }}
+                            sx={{
+                              boxShadow: 'none',
+                              '&:hover': {
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                              },
+                            }}
+                          >
+                            Actualizar
+                          </Button>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box sx={{ mt: 2 }}>
-              {tasks.length === 0 && (
-                <Typography sx={{ textAlign: 'center' }}>
-                  No hay tareas asignadas para este proyecto.
+            
+            {tasks.length === 0 && (
+              <Box sx={{ 
+                py: 8, 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center',
+                gap: 2 
+              }}>
+                <TaskIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
+                <Typography variant="h6" color="text.secondary">
+                  No hay tareas asignadas para este proyecto
                 </Typography>
-              )}
-              <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button onClick={handleCloseTasksModal}>
-                  Cerrar
-                </Button>
               </Box>
-            </Box>
+            )}
+          </Box>
+
+          <Box sx={{ 
+            p: 2, 
+            borderTop: 1, 
+            borderColor: 'divider',
+            backgroundColor: 'background.default',
+            display: 'flex',
+            justifyContent: 'flex-end' 
+          }}>
+            <Button
+              onClick={handleCloseTasksModal}
+              variant="contained"
+              color="primary"
+              startIcon={<CloseIcon />}
+              sx={{
+                boxShadow: 'none',
+                '&:hover': {
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                },
+              }}
+            >
+              Cerrar
+            </Button>
           </Box>
         </Paper>
-      </TaskModal>
+      </StyledModal>
 
       <Dialog open={taskUpdateDialog} onClose={() => setTaskUpdateDialog(false)}>
         <DialogTitle>

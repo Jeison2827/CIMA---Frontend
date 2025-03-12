@@ -61,10 +61,10 @@ const Dashboard = () => {
               
             </>
           )}
+          
           {user.role === 'Client' && (
             <>
               <li onClick={() => changeView('clientProjects')}><i className="fas fa-project-diagram"></i> Mis Proyectos</li>
-              <li onClick={() => changeView('projectStatus')}><i className="fas fa-chart-line"></i> Estado del Proyecto</li>
               <li onClick={() => changeView('customerSupport')}><i className="fas fa-headset"></i> Soporte al Cliente</li>
               <li onClick={() => changeView('faqClient')}><i className="fas fa-question-circle"></i> Preguntas Frecuentes</li>
             </>
@@ -82,9 +82,16 @@ const Dashboard = () => {
           {activeView === 'adminDashboard' && user.role === 'Admin' && <AdminDashboard />}
           {activeView === 'excelImport' && <ExcelImport />}
           {activeView === 'excelExport' && <ExcelExport />}
-          {activeView === 'projectStatus' && <ProjectStatus userRole={user.role} />}
+          {(activeView === 'projectStatus' || activeView.startsWith('project-status/')) && (
+            <ProjectStatus 
+              userRole={user.role} 
+              projectId={activeView.startsWith('project-status/') ? activeView.split('/')[1] : null}
+            />
+          )}
           {activeView === 'customerSupport' && <CustomerSupport />}
-          {activeView === 'clientProjects' && user.role === 'Client' && <ClientProjects />}
+          {activeView === 'clientProjects' && user.role === 'Client' && (
+            <ClientProjects onChangeView={changeView} />
+          )}
           {activeView === 'faqClient' && user.role === 'Client' && <FaqClient />}
           {activeView === 'workerProjects' && user.role === 'Worker' && <WorkerProjects />}
           {activeView === 'workerTasks' && user.role === 'Worker' && <WorkerTasks />}
