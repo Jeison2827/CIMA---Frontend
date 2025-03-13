@@ -118,13 +118,19 @@ const ProjectsPage = () => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h4" component="h1">
+                <Typography variant="h4" component="h1" sx={{ color: '#592d2d' }}>
                   Gestión de Proyectos
                 </Typography>
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={() => setOpenForm(true)}
+                  sx={{
+                    bgcolor: 'black',
+                    '&:hover': {
+                      bgcolor: '#333333'
+                    }
+                  }}
                 >
                   Nuevo Proyecto
                 </Button>

@@ -155,7 +155,7 @@ const TaskManagement = () => {
         { id: 2, projectId: 102, workerId: 202, description: 'Implementar autenticación de usuarios', status: 'In Progress', createdAt: '2023-05-16' },
         { id: 3, projectId: 101, workerId: 203, description: 'Diseñar interfaz de usuario para dashboard', status: 'Completed', createdAt: '2023-05-10' },
         { id: 4, projectId: 103, workerId: 201, description: 'Optimizar consultas de base de datos', status: 'In Progress', createdAt: '2023-05-18' },
-        { id: 5, projectId: 102, workerId: 204, description: 'Crear API para gestión de tareas', status: 'Pending', createdAt: '2023-05-20' },
+        { id: 5, projectId: 102, workerId: 204, description: 'Crear API para gestión de tareasSSSS', status: 'Pending', createdAt: '2023-05-20' },
         { id: 6, projectId: 104, workerId: 205, description: 'Implementar sistema de notificaciones', status: 'Completed', createdAt: '2023-05-12' },
       ];
       console.log('Using mock tasks due to error');
@@ -413,19 +413,33 @@ const TaskManagement = () => {
   return (
     <div className="task-management-container">
       <Tabs 
-        value={tabValue} 
-        onChange={handleTabChange}
-        variant="fullWidth"
-        className="task-tabs"
-      >
-        <Tab label="Gestión de Tareas" />
-        {isAdmin && <Tab label="Estadísticas" />}
-      </Tabs>
+            value={tabValue} 
+            onChange={handleTabChange}
+            variant="fullWidth"
+            className="task-tabs"
+            sx={{
+              '& .MuiTab-root': {
+                color: '#592d2d',
+                '&:hover': {
+                  color: '#000000',
+                },
+                '&.Mui-selected': {
+                  color: '#000000',
+                }
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#000000',
+              }
+            }}
+          >
+            <Tab label="Gestión de Tareas" />
+            {isAdmin && <Tab label="Estadísticas" />}
+          </Tabs>
 
       {tabValue === 0 && (
         <>
           <div className="task-header">
-            <Typography variant="h4" component="h1">
+            <Typography variant="h4" component="h1" sx={{ color: '#592d2d' }}>
               Gestión de Tareas
             </Typography>
             <div className="task-header-actions">
@@ -444,9 +458,9 @@ const TaskManagement = () => {
                 startIcon={<AddIcon />}
                 onClick={() => handleOpen()}
                 sx={{ 
-                  background: 'linear-gradient(45deg, #2c3e50 30%, #3498db 90%)',
+                  background: 'linear-gradient(45deg, #2c3e50 30%,rgb(0, 0, 0) 90%)',
                   boxShadow: '0 3px 5px 2px rgba(52, 152, 219, .3)'
-                }}
+                }}  
               >
                 Nueva Tarea
               </Button>
@@ -511,54 +525,14 @@ const TaskManagement = () => {
               </Select>
             </FormControl>
             
-            <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Trabajador</InputLabel>
-              <Select
-                value={workerFilter}
-                onChange={(e) => setWorkerFilter(e.target.value)}
-                label="Trabajador"
-              >
-                <MenuItem value="">Todos</MenuItem>
-                <MenuItem value="201">Trabajador #201</MenuItem>
-                <MenuItem value="202">Trabajador #202</MenuItem>
-                <MenuItem value="203">Trabajador #203</MenuItem>
-                <MenuItem value="204">Trabajador #204</MenuItem>
-                <MenuItem value="205">Trabajador #205</MenuItem>
-              </Select>
-            </FormControl>
+      
             
             <IconButton onClick={loadTasks} color="primary">
               <RefreshIcon />
             </IconButton>
           </div>
 
-          {isAdmin && (
-            <div className="date-range-filter">
-              <TextField
-                label="Fecha Inicio"
-                type="date"
-                size="small"
-                value={dateRangeFilter.startDate}
-                onChange={(e) => setDateRangeFilter({...dateRangeFilter, startDate: e.target.value})}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Fecha Fin"
-                type="date"
-                size="small"
-                value={dateRangeFilter.endDate}
-                onChange={(e) => setDateRangeFilter({...dateRangeFilter, endDate: e.target.value})}
-                InputLabelProps={{ shrink: true }}
-              />
-              <Button 
-                variant="outlined" 
-                startIcon={<DateRangeIcon />}
-                onClick={handleDateRangeSearch}
-              >
-                Buscar por Fechas
-              </Button>
-            </div>
-          )}
+          
 
           {loading ? (
             <div className="loading-container">
@@ -600,7 +574,7 @@ const TaskManagement = () => {
                             onClick={() => handleDelete(task.taskId || task.id)}
                             sx={{
                               color: '#d32f2f',
-                              '&:hover': {
+                              '&:hover': {  
                                 backgroundColor: 'rgba(211, 47, 47, 0.08)',
                               }
                             }}
@@ -623,7 +597,7 @@ const TaskManagement = () => {
                     
                     <div className="task-card-footer">
                       <div className="task-worker-info">
-                        <Avatar sx={{ width: 24, height: 24, bgcolor: '#3498db' }}>
+                        <Avatar sx={{ width: 24, height: 24, bgcolor: '#000000' }}>
                           {task.workerName ? task.workerName.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
                         </Avatar>
                         <span>{task.workerName || `Trabajador #${task.workerId}`}</span>

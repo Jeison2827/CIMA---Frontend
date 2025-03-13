@@ -109,7 +109,7 @@ const SearchBar = styled('div')(({ theme }) => ({
 const StyledTableHead = styled(TableHead)(({ theme }) => ({
   '& .MuiTableCell-head': {
     background: '#f3f6f9',
-    color: '#3f4254',
+    color: '#592d2d',
     fontWeight: 600,
     fontSize: '0.95rem',
     padding: '16px 24px',
@@ -416,10 +416,10 @@ const UserManagement = () => {
               startIcon={<AddIcon />}
               onClick={() => openDialog('create')}
               sx={{
-                background: 'linear-gradient(135deg, #3699ff 0%, #2284f7 100%)',
+                background: 'linear-gradient(135deg,rgb(0, 0  , 0) 0%,rgb(0, 0, 0) 100%)',
                 color: 'white',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #2284f7 0%, #1876f0 100%)',
+                  background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(207, 215, 224) 100%)',
                 },
               }}
             >
@@ -465,7 +465,7 @@ const UserManagement = () => {
                 <TableCell align="right">
                   <IconButton
                     onClick={() => openDialog('edit', user)}
-                    sx={{ color: '#3699ff' }}
+                    sx={{ color: '#592d2d' }}
                   >
                     <EditIcon />
                   </IconButton>

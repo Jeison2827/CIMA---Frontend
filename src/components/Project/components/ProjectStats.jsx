@@ -21,20 +21,19 @@ const StatCard = ({ title, value, icon, color }) => (
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      // Fondo neutro y borde con el color indicado
       bgcolor: 'background.paper',
       border: '2px solid',
       borderColor: `${color}.main`,
-      color: 'text.primary'
+      color: '#592d2d'  // Updated text color
     }}
   >
     <Box display="flex" alignItems="center" mb={1}>
       {icon}
-      <Typography variant="h6" component="div" ml={1}>
+      <Typography variant="h6" component="div" ml={1} sx={{ color: '#000000' }}>
         {title}
       </Typography>
     </Box>
-    <Typography variant="h4" component="div">
+    <Typography variant="h4" component="div" sx={{ color: '#000000' }}>
       {value}
     </Typography>
     <LinearProgress

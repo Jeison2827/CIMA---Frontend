@@ -79,7 +79,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   border: '1px solid',
   borderColor: theme.palette.divider,
   '& .MuiTableCell-head': {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: "#8e3031",
     color: theme.palette.common.white,
     fontWeight: 600,
     fontSize: '0.95rem',
@@ -90,6 +90,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   '& .MuiTableRow-root': {
     transition: 'all 0.3s ease',
     borderBottom: `1px solid ${theme.palette.divider}`,
+    color: '#000000',
     '&:hover': {
       backgroundColor: alpha(theme.palette.primary.main, 0.04),
       transform: 'translateY(-1px)',
@@ -97,10 +98,10 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   },
   '& .file-name': {
     fontWeight: 500,
-    color: theme.palette.text.primary,
+    color: "#8e3031",
   },
   '& .file-info': {
-    color: theme.palette.text.secondary,
+    color: '#000000',
     fontSize: '0.875rem',
   },
 }));
@@ -268,20 +269,20 @@ const ExcelImport = ({ projectId = 42 }) => {
               fontWeight: 700, 
               color: 'primary.main', 
               mb: 1,
-              background: 'linear-gradient(90deg, #1976d2, #42a5f5)',
+              background: 'linear-gradient(90deg, #592d2d, #592d2d)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
           >
             Gestor de Documentos
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 4 }}>
+          <Typography variant="subtitle1" color="#000000  " sx={{ mb: 4 }}>
             Gestiona y organiza los archivos de tus proyectos de forma eficiente
           </Typography>
 
-          <StyledCard>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          
+            <CardContent sx={{ p: 3  }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box
                   sx={{
                     backgroundColor: 'primary.lighter',
@@ -292,7 +293,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <ProjectIcon sx={{ color: 'primary.main', fontSize: 28 }} />
+                  <ProjectIcon sx={{ color: '#592d2d', fontSize: 28 }} />
                 </Box>
                 <FormControl fullWidth>
                   <InputLabel>Seleccionar Proyecto</InputLabel>
@@ -302,10 +303,10 @@ const ExcelImport = ({ projectId = 42 }) => {
                     label="Seleccionar Proyecto"
                     sx={{
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.light',
+                        borderColor: '#000000',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main',
+                        borderColor: '#592d2d',
                       },
                     }}
                   >
@@ -322,7 +323,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                 </FormControl>
               </Box>
             </CardContent>
-          </StyledCard>
+         
 
           {selectedProject ? (
             <>
@@ -346,7 +347,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                       mb: 2,
                     }}
                   >
-                    <UploadIcon sx={{ fontSize: 40, color: 'primary.main' }} />
+                    <UploadIcon sx={{ fontSize: 40, color: '#8e3031' }} />
                   </Box>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                     Arrastra archivos aquí
@@ -420,6 +421,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                       <TableCell>Archivo</TableCell>
                       <TableCell>Información</TableCell>
                       <TableCell>Tamaño</TableCell>
+                      <TableCell>Descargar</TableCell>
                       <TableCell align="right">Acciones</TableCell>
                     </TableRow>
                   </TableHead>
@@ -428,36 +430,39 @@ const ExcelImport = ({ projectId = 42 }) => {
                       <TableRow key={file.fileId}>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <FileIcon sx={{ mr: 2, color: 'primary.main' }} />
-                            <Typography className="file-name">{file.originalName || 'Sin nombre'}</Typography>
+                            <FileIcon sx={{ mr: 2, color: '#592d2d' }} />
+                            <Typography className="file-name" sx={{ color: '#000000' }}>
+                              {file.originalName || 'Sin nombre'}
+                            </Typography>
                           </Box>
                         </TableCell>
                         <TableCell className="file-info">
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ color: '#000000' }}>
                             Subido el: {file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('es-ES') : 'Fecha no disponible'}
                           </Typography>
                         </TableCell>
                         <TableCell className="file-info">
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ color: '#000000' }}>
                             {file.fileSize ? `${(file.fileSize / 1024).toFixed(2)} KB` : 'Tamaño no disponible'}
                           </Typography>
                         </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(file.fileId)}
+                            sx={{ 
+                              backgroundColor: '#592d2d',
+                              '&:hover': {
+                                backgroundColor: '#8e3031',
+                              }
+                            }}
+                          >
+                            Descargar
+                          </Button>
+                        </TableCell>
                         <TableCell align="right">
                           <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                            <Tooltip title="Descargar archivo">
-                              <IconButton 
-                                onClick={() => handleDownload(file.fileId)}
-                                sx={{ 
-                                  color: 'primary.main',
-                                  '&:hover': { 
-                                    backgroundColor: 'primary.light',
-                                    color: 'primary.dark'
-                                  }
-                                }}
-                              >
-                                <DownloadIcon />
-                              </IconButton>
-                            </Tooltip>
                             <Tooltip title="Eliminar archivo">
                               <IconButton 
                                 onClick={() => setConfirmDelete({ open: true, fileId: file.fileId })}
@@ -495,7 +500,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                 gap: 2,
               }}
             >
-              <ProjectIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.5 }} />
+              <ProjectIcon sx={{ fontSize: 48, color: '#592d2d', opacity: 0.5 }} />
               <Typography variant="h6" color="text.secondary">
                 Seleccione un proyecto para gestionar sus documentos
               </Typography>

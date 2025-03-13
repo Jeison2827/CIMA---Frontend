@@ -23,7 +23,7 @@ const DashboardContainer = styled("div")(({ theme }) => ({
 const DashboardTitle = styled(Typography)(({ theme }) => ({
   fontSize: "36px",
   fontWeight: "800",
-  color: "#1a237e",
+  color: "#592d2d",
   marginBottom: "30px",
   position: "relative",
   "&:after": {
@@ -60,26 +60,26 @@ const CustomCard = styled(Card)(({ theme }) => ({
   }
 }));
 
-const IconWrapper = styled("div")(({ theme }) => ({
-  background: "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
+const IconWrapper = styled("div")(({ color }) => ({
+  background: "WHITE",
   borderRadius: "50%",
   padding: "20px",
   marginBottom: "8px",
   "& .MuiSvgIcon-root": {
     fontSize: "40px",
-    color: "#1a237e",
+    color: "#592d2d"
   }
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  background: "linear-gradient(90deg, #1a237e 0%, #3949ab 100%)",
+  background: "linear-gradient(90deg,rgb(0, 0, 0) 0%,rgb(0, 0, 0) 100%)",
   color: "white",
   padding: "10px 24px",
   borderRadius: "8px",
   textTransform: "none",
   fontWeight: "600",
   "&:hover": {
-    background: "linear-gradient(90deg, #0d47a1 0%, #1a237e 100%)",
+    background: "linear-gradient(90deg,rgb(32, 22, 22) 0%, white 100%)",
   }
 }));
 
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
     <DashboardContainer>
       {selectedView === "dashboard" && (
         <>
-          <DashboardTitle variant="h4">
+          <DashboardTitle variant="h4"  color="secondary">
             Panel de Administración
           </DashboardTitle>
           <Grid container spacing={4} justifyContent="center">
@@ -100,19 +100,19 @@ const AdminDashboard = () => {
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("createClient")}>
                 <CardContent>
-                  <IconWrapper>
+                  <IconWrapper color="projects">
                     <PersonAddIcon />
                   </IconWrapper>
                   <Typography variant="h6" sx={{ 
                     fontWeight: "700",
-                    color: "#1a237e",
+                    color: "#8e3031",
                     fontSize: "1.25rem",
-                    marginBottom: 1
+                    marginBottom: 1,
                   }}>
                     Gestión De Proyectos
                   </Typography>
                   <Typography variant="body1" sx={{
-                    color: "#546e7a",
+                    color: "#8e3031",
                     lineHeight: 1.6
                   }}>
                     Agrega y administra nuevos proyectos en el sistema
@@ -125,19 +125,19 @@ const AdminDashboard = () => {
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("clients")}>
                 <CardContent>
-                  <IconWrapper>
+                  <IconWrapper color="clients">
                     <GroupIcon />
                   </IconWrapper>
                   <Typography variant="h6" sx={{ 
                     fontWeight: "700",
-                    color: "#1a237e",
+                    color: "#8e3031",
                     fontSize: "1.25rem",
                     marginBottom: 1
                   }}>
                     Gestionar Clientes
                   </Typography>
                   <Typography variant="body1" sx={{
-                    color: "#546e7a",
+                    color: "#8e3031",
                     lineHeight: 1.6
                   }}>
                     Administra la información de los clientes
@@ -150,19 +150,19 @@ const AdminDashboard = () => {
             <Grid item xs={12} sm={6} md={4}>
               <CustomCard onClick={() => setSelectedView("roles")}>
                 <CardContent>
-                  <IconWrapper>
+                  <IconWrapper color="tasks">
                     <SecurityIcon />
                   </IconWrapper>
                   <Typography variant="h6" sx={{ 
                     fontWeight: "700",
-                    color: "#1a237e",
+                    color: "#8e3031",
                     fontSize: "1.25rem",
                     marginBottom: 1
                   }}>
                     Gestionar Tareas
                   </Typography>
                   <Typography variant="body1" sx={{
-                    color: "#546e7a",
+                    color: "#8e3031",
                     lineHeight: 1.6
                   }}>
                     Asigna y gestiona roles de usuario

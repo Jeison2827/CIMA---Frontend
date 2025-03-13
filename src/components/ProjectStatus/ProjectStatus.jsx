@@ -116,7 +116,7 @@ const ProjectStatus = ({ userRole }) => {
 
   return (
     <Box className="project-status-container" sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 4, color:"#8e3031" }}>
         Estado de Proyectos
       </Typography>
 
@@ -320,7 +320,11 @@ const ProjectStatus = ({ userRole }) => {
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
-                  px: 3
+                  px: 3,
+                  backgroundColor: '#000000',
+                  '&:hover': {
+                    backgroundColor: '#333333'
+                  }
                 }}
               >
                 Cerrar
