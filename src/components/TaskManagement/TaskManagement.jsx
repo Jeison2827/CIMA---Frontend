@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';  
 import {
   Box,
   Button,
@@ -52,16 +53,17 @@ import { useSelector } from 'react-redux';
 
 const TaskManagement = () => {
   // Estado para el usuario actual
-  const { user } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
   const isAdmin = user && user.role === 'Admin';
-
+  // Añadir este estado para los trabajadores
+  const [allWorkers, setAllWorkers] = useState([]);
   // Estados para tareas
   const [tasks, setTasks] = useState([]); // Inicializado como arreglo vacío
   const [error, setError] = useState(null);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState([]);
-  
+  const [allProjects, setAllProjects] = useState([]);
   // Estados para diálogos
   const [open, setOpen] = useState(false);
   const [bulkActionOpen, setBulkActionOpen] = useState(false);
@@ -101,12 +103,69 @@ const TaskManagement = () => {
 
   useEffect(() => {
     loadTasks();
+    fetchAllProjects(); // Fetch projects on component mount
+    fetchAllWorkers(); 
   }, []);
 
   useEffect(() => {
     filterTasks();
   }, [tasks, searchTerm, statusFilter, projectFilter, workerFilter]);
-
+  const fetchAllProjects = async () => {
+    try {
+      // Using the correct endpoint for projects
+      const response = await axios.get(`http://localhost:3000/developer/projects`, getHeaders());
+      
+      if (response.data.success && Array.isArray(response.data.projects)) {
+        setAllProjects(response.data.projects, "esto es response");
+      } else {
+        console.error('Invalid response format for projects:', response.data);
+        setAllProjects([]);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setAllProjects([]);
+    }
+  };
+  // Helper function to get headers with token
+const getHeaders = () => {
+  const accessToken = token || localStorage.getItem('accessToken');
+  return {
+    headers: {
+      'accessToken': accessToken
+    }
+  };
+};
+// Add this function to fetch all workers
+const fetchAllWorkers = async () => {
+  try {
+    // Intentar obtener el token de Redux, y si no está disponible, del localStorage
+    const accessToken = token || localStorage.getItem('accessToken');
+    
+    if (!accessToken) {
+      console.error('No hay token disponible');
+      return;
+    }
+    
+    const response = await axios.get(
+      'http://localhost:3000/developer/users/workers',
+      {
+        headers: {
+          'accessToken': accessToken
+        }
+      }
+    );
+    
+    if (response.data.success && Array.isArray(response.data.workers)) {
+      setAllWorkers(response.data.workers);
+    } else {
+      console.error('Invalid response format for workers:', response.data);
+      setAllWorkers([]);
+    }
+  } catch (error) {
+    console.error('Error fetching workers:', error);
+    setAllWorkers([]);
+  }
+};
   const loadTasks = async () => {
     setLoading(true);
     setError(null);
@@ -204,51 +263,56 @@ const TaskManagement = () => {
   
     let result = [...tasks];
     
-    // Filtrar por término de búsqueda
+    // Filtrar por término de búsqueda (incluye nombre de proyecto)
     if (searchTerm) {
       result = result.filter(task => 
-        task.description.toLowerCase().includes(searchTerm.toLowerCase())
+        task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (task.projectName && task.projectName.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
     
-    // Filtrar por estado (si no se aplicó en la carga)
-    if (statusFilter !== 'all' && !workerFilter && !projectFilter) {
+    // Filtrar por estado - corregido para que funcione siempre que no sea "all"
+    if (statusFilter !== 'all') {
       result = result.filter(task => task.status === statusFilter);
     }
     
-    // Filtrar por proyecto (si no se aplicó en la carga)
-    if (projectFilter && (workerFilter || statusFilter !== 'all')) {
+    // Filtrar por proyecto
+    if (projectFilter) {
       result = result.filter(task => task.projectId.toString() === projectFilter.toString());
     }
     
-    // Filtrar por trabajador (si no se aplicó en la carga)
-    if (workerFilter && (projectFilter || statusFilter !== 'all')) {
+    // Filtrar por trabajador
+    if (workerFilter) {
       result = result.filter(task => task.workerId.toString() === workerFilter.toString());
     }
     
     setFilteredTasks(result);
   };
 
-  const handleOpen = (task = null) => {
-    if (task) {
-      setSelectedTask(task);
-      setFormData({
-        projectId: task.projectId,
-        workerId: task.workerId,
-        description: task.description,
-        status: task.status
-      });
-    } else {
-      setSelectedTask(null);
-      setFormData({
-        projectId: '',
-        workerId: '',
-        description: '',
-        status: 'Pending'
-      });
-    }
-    setOpen(true);
-  };
+// Modify handleOpen to fetch projects when opening the dialog
+const handleOpen = (task = null) => {
+  fetchAllWorkers(); // Fetch all workers when opening the dialog
+  fetchAllProjects(); // Fetch all projects when opening the dialog
+  
+  if (task) {
+    setSelectedTask(task);
+    setFormData({
+      projectId: task.projectId,
+      workerId: task.workerId,
+      description: task.description,
+      status: task.status
+    });
+  } else {
+    setSelectedTask(null);
+    setFormData({
+      projectId: '',
+      workerId: '',
+      description: '',
+      status: 'Pending'
+    });
+  }
+  setOpen(true);
+};
 
   const handleClose = () => {
     setOpen(false);
@@ -305,6 +369,8 @@ const TaskManagement = () => {
       toast.warning('Seleccione al menos una tarea');
       return;
     }
+    fetchAllWorkers();
+    fetchAllProjects();
     setBulkActionOpen(true);
   };
 
@@ -469,7 +535,7 @@ const TaskManagement = () => {
 
           <div className="task-filters">
             <TextField
-              placeholder="Buscar tareas..."
+              placeholder="Buscar por descripción o nombre de proyecto..."
               variant="outlined"
               size="small"
               value={searchTerm}
@@ -545,73 +611,79 @@ const TaskManagement = () => {
               {filteredTasks.length > 0 ? (
                 filteredTasks.map((task) => (
                   <div key={task.taskId || task.id} className="task-card">
-                    {isAdmin && (
-                      <Checkbox
-                        checked={selectedTasks.includes(task.taskId || task.id)}
-                        onChange={() => handleTaskSelection(task.taskId || task.id)}
-                        className="task-checkbox"
-                      />
-                    )}
-                    <div className="task-card-header">
-                      <div>
-                        <Typography className="task-project-name">
-                          <AssignmentIcon className="task-project-icon" />
-                          {task.projectName || `Proyecto #${task.projectId}`}
-                        </Typography>
-                        <span className={`task-status-chip ${getStatusClass(task.status)}`}>
-                          {getStatusIcon(task.status)} {task.status}
-                        </span>
-                      </div>
-                      <div className="task-actions">
-                        <Tooltip title="Editar">
-                          <IconButton size="small" onClick={() => handleOpen(task)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Eliminar">
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleDelete(task.taskId || task.id)}
-                            sx={{
-                              color: '#d32f2f',
-                              '&:hover': {  
-                                backgroundColor: 'rgba(211, 47, 47, 0.08)',
-                              }
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </div>
-                    </div>
-                    
-                    <Typography className="task-card-description">
-                      {task.description}
-                    </Typography>
-                    
-                    {task.projectDescription && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        <strong>Proyecto:</strong> {task.projectDescription}
-                      </Typography>
-                    )}
-                    
-                    <div className="task-card-footer">
-                      <div className="task-worker-info">
-                        <Avatar sx={{ width: 24, height: 24, bgcolor: '#000000' }}>
-                          {task.workerName ? task.workerName.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
-                        </Avatar>
-                        <span>{task.workerName || `Trabajador #${task.workerId}`}</span>
-                        {task.workerEmail && (
-                          <Typography variant="caption" sx={{ ml: 1 }}>
-                            ({task.workerEmail})
-                          </Typography>
-                        )}
-                      </div>
-                      <div className="task-date">
-                        {new Date(task.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
+  {isAdmin && (
+    <Checkbox
+      checked={selectedTasks.includes(task.taskId || task.id)}
+      onChange={() => handleTaskSelection(task.taskId || task.id)}
+      className="task-checkbox"
+    />
+  )}
+
+  {/* Botón de eliminar posicionado en la esquina superior derecha */}
+  <div className="delete-icon">
+    <Tooltip title="Eliminar">
+      <IconButton 
+        size="small" 
+        onClick={() => handleDelete(task.taskId || task.id)}
+        sx={{
+          color: '#d32f2f',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' }
+        }}
+      >
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  </div>
+
+  <div className="task-card-header">
+    <div>
+      <Typography className="task-project-name">
+        <AssignmentIcon className="task-project-icon" />
+        {task.projectName || `Proyecto #${task.projectId}`}
+      </Typography>
+      <span className={`task-status-chip ${getStatusClass(task.status)}`}>
+        {getStatusIcon(task.status)} {task.status}
+      </span>
+    </div>
+    <div className="task-actions">
+      <Tooltip title="Editar">
+        <IconButton 
+          size="small" 
+          onClick={() => handleOpen(task)}
+          sx={{ 
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 1)' }
+          }}
+        >
+          <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      {/* Eliminamos el botón de eliminar de aquí */}
+    </div>
+  </div>
+  {/* Resto del contenido de la tarjeta */}
+  <Typography className="task-card-description">
+    {task.description}
+  </Typography>
+  <div className="task-card-footer">
+    <div className="task-worker-info">
+      <Avatar sx={{ width: 24, height: 24, bgcolor: '#000000' }}>
+        {task.workerName ? task.workerName.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
+      </Avatar>
+      <span>{task.workerName || `Trabajador #${task.workerId}`}</span>
+      {task.workerEmail && (
+        <Typography variant="caption" sx={{ ml: 1 }}>
+          ({task.workerEmail})
+        </Typography>
+      )}
+    </div>
+    <div className="task-date">
+      {new Date(task.createdAt).toLocaleDateString()}
+    </div>
+  </div>
+</div>
+
                 ))
               ) : (
                 <Typography variant="body1" sx={{ gridColumn: '1 / -1', textAlign: 'center', py: 4 }}>
@@ -848,24 +920,72 @@ const TaskManagement = () => {
         </DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
-            <TextField
-              fullWidth
-              label="ID del Proyecto"
-              type="number"
-              margin="normal"
-              required
-              value={formData.projectId}
-              onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
-            />
-            <TextField
-              fullWidth
-              label="ID del Trabajador"
-              type="number"
-              margin="normal"
-              required
-              value={formData.workerId}
-              onChange={(e) => setFormData({ ...formData, workerId: e.target.value })}
-            />
+          <FormControl fullWidth margin="normal" required>
+  <InputLabel>Proyecto</InputLabel>
+  <Select
+    value={formData.projectId}
+    onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
+    label="Proyecto"
+  >
+    {allProjects.length > 0 ? (
+      allProjects.map(project => (
+        <MenuItem key={project.projectId} value={project.projectId}>
+          {project.projectName}
+        </MenuItem>
+      ))
+    ) : (
+      // Fallback to filtered tasks if allProjects is empty
+      filteredTasks
+        .reduce((uniqueProjects, task) => {
+          if (task.projectId && !uniqueProjects.some(p => p.id === task.projectId)) {
+            uniqueProjects.push({
+              id: task.projectId,
+              name: task.projectName || `Proyecto #${task.projectId}`
+            });
+          }
+          return uniqueProjects;
+        }, [])
+        .map(project => (
+          <MenuItem key={project.id} value={project.id}>
+            {project.name}
+          </MenuItem>
+        ))
+    )}
+  </Select>
+</FormControl>
+            <FormControl fullWidth margin="normal" required>
+  <InputLabel>Trabajador</InputLabel>
+  <Select
+    value={formData.workerId}
+    onChange={(e) => setFormData({ ...formData, workerId: e.target.value })}
+    label="Trabajador"
+  >
+    {allWorkers.length > 0 ? (
+      allWorkers.map(worker => (
+        <MenuItem key={worker.userId} value={worker.userId}>
+          {worker.name} ({worker.email})
+        </MenuItem>
+      ))
+    ) : (
+      // Fallback to filtered tasks if allWorkers is empty
+      filteredTasks
+        .reduce((uniqueWorkers, task) => {
+          if (task.workerId && !uniqueWorkers.some(w => w.id === task.workerId)) {
+            uniqueWorkers.push({
+              id: task.workerId,
+              name: task.workerName || `Trabajador #${task.workerId}`
+            });
+          }
+          return uniqueWorkers;
+        }, [])
+        .map(worker => (
+          <MenuItem key={worker.id} value={worker.id}>
+            {worker.name}
+          </MenuItem>
+        ))
+    )}
+  </Select>
+</FormControl>
             <TextField
               fullWidth
               label="Descripción"
@@ -939,15 +1059,39 @@ const TaskManagement = () => {
           )}
 
           {bulkAction.action === 'assign' && (
-            <TextField
-              fullWidth
-              label="ID del Trabajador"
-              type="number"
-              margin="normal"
-              required
-              value={bulkAction.workerId}
-              onChange={(e) => setBulkAction({ ...bulkAction, workerId: e.target.value })}
-            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Trabajador</InputLabel>
+              <Select
+                value={bulkAction.workerId}
+                onChange={(e) => setBulkAction({ ...bulkAction, workerId: e.target.value })}
+                label="Trabajador"
+              >
+                {allWorkers.length > 0 ? (
+                  allWorkers.map(worker => (
+                    <MenuItem key={worker.userId} value={worker.userId}>
+                      {worker.name} ({worker.email})
+                    </MenuItem>
+                  ))
+                ) : (
+                  // Fallback to filtered tasks if allWorkers is empty
+                  filteredTasks
+                    .reduce((uniqueWorkers, task) => {
+                      if (task.workerId && !uniqueWorkers.some(w => w.id === task.workerId)) {
+                        uniqueWorkers.push({
+                          id: task.workerId,
+                          name: task.workerName || `Trabajador #${task.workerId}`
+                        });
+                      }
+                      return uniqueWorkers;
+                    }, [])
+                    .map(worker => (
+                      <MenuItem key={worker.id} value={worker.id}>
+                        {worker.name}
+                      </MenuItem>
+                    ))
+                )}
+              </Select>
+            </FormControl>
           )}
         </DialogContent>
         <DialogActions>
@@ -956,8 +1100,8 @@ const TaskManagement = () => {
           </Button>
           <Button 
             onClick={handleBulkActionSubmit} 
-            variant="contained" 
-            color="primary"
+            
+            color="white"
             disabled={loading || (bulkAction.action === 'assign' && !bulkAction.workerId)}
           >
             {loading ? <CircularProgress size={24} /> : 'Aplicar'}

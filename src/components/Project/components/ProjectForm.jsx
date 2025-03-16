@@ -41,12 +41,13 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
     borderRadius: 16,
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+    overflowX: 'hidden'
   }
 }));
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  background: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
+  background: '#000000',
+  color: '#ffffff',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -57,6 +58,17 @@ const FormSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(3),
   '& .MuiFormControl-root': {
     marginBottom: theme.spacing(2),
+  },
+  '& .MuiOutlinedInput-root': {
+    '&:hover fieldset': {
+      borderColor: '#8e3031',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#592d2d',
+    }
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+    color: '#592d2d',
   }
 }));
 
@@ -159,7 +171,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
     >
       <StyledDialogTitle>
         <Box display="flex" alignItems="center">
-          <AssignmentIcon sx={{ mr: 1 }} />
+          <AssignmentIcon sx={{ mr: 1, color: '#000000' }} />
           <Typography variant="h6">
             {project ? 'Editar Proyecto' : 'Crear Nuevo Proyecto'}
           </Typography>
@@ -167,14 +179,17 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         <IconButton 
           onClick={onClose}
           size="small"
-          sx={{ color: 'inherit' }}
+          sx={{ color: '#000000' }}
         >
           <CloseIcon />
         </IconButton>
       </StyledDialogTitle>
 
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ pt: 3 }}>
+        <DialogContent sx={{ 
+          pt: 3,
+          overflowX: 'hidden' // Prevents horizontal scrolling
+        }}>
           {loading ? (
             <Box display="flex" justifyContent="center" my={3}>
               <CircularProgress />
@@ -189,8 +204,8 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
                 <Grid item xs={12}>
                   <FormSection>
                     <Box display="flex" alignItems="center" mb={2}>
-                      <BusinessIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      <Typography variant="subtitle1" color="primary">
+                      <BusinessIcon sx={{ mr: 1, color: '#592d2d' }} />
+                      <Typography variant="subtitle1" sx={{ color: '#592d2d' }}>
                         Información del Cliente
                       </Typography>
                     </Box>
@@ -213,7 +228,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
                                     width: 24, 
                                     height: 24, 
                                     mr: 1,
-                                    bgcolor: 'primary.main' 
+                                    bgcolor: '#592d2d' 
                                   }}
                                 >
                                   {(client.name || '?')[0].toUpperCase()}
@@ -236,8 +251,8 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
 
                   <FormSection>
                     <Box display="flex" alignItems="center" mb={2}>
-                      <DescriptionIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      <Typography variant="subtitle1" color="primary">
+                      <DescriptionIcon sx={{ mr: 1, color: '#592d2d' }} />
+                      <Typography variant="subtitle1" sx={{ color: '#592d2d' }}>
                         Detalles del Proyecto
                       </Typography>
                     </Box>
@@ -267,19 +282,29 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
 
                   <FormSection>
                     <Box display="flex" alignItems="center" mb={2}>
-                      <ScheduleIcon sx={{ mr: 1, color: 'primary.main' }} />
-                      <Typography variant="subtitle1" color="primary">
+                      <ScheduleIcon sx={{ mr: 1, color: '#592d2d' }} />
+                      <Typography variant="subtitle1" sx={{ color: '#592d2d' }}>
                         Estado del Proyecto
                       </Typography>
                     </Box>
                     
                     <FormControl fullWidth>
-                      <InputLabel>Estado</InputLabel>
+                      <InputLabel sx={{ '&.Mui-focused': { color: '#592d2d' } }}>
+                        Estado
+                      </InputLabel>
                       <Select
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
                         label="Estado"
+                        sx={{
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8e3031',
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#592d2d',
+                          }
+                        }}
                       >
                         {statusOptions.map(option => (
                           <MenuItem key={option.value} value={option.value}>
@@ -302,8 +327,16 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
           <Button 
             onClick={onClose} 
-            color="inherit"
-            variant="outlined"
+            sx={{
+              color: '#ffffff',
+              backgroundColor: '#000000',
+              borderColor: '#000000',
+              '&:hover': {
+                backgroundColor: '#333333',
+                borderColor: '#333333',
+              }
+            }}
+            variant="contained"
             startIcon={<CloseIcon />}
           >
             Cancelar
@@ -311,9 +344,19 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             disabled={!isValid() || loading}
-            sx={{ ml: 2 }}
+            sx={{ 
+              ml: 2,
+              color: '#ffffff',
+              bgcolor: '#000000',
+              '&:hover': {
+                bgcolor: '#333333',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'rgba(0, 0, 0, 0.3)',
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }}
           >
             {loading ? (
               <CircularProgress size={24} color="inherit" />

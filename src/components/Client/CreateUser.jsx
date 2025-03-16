@@ -155,26 +155,37 @@ const AdminDashboard = () => {
   return (
     <Box sx={{ p: 4 }}>
       <ToastContainer />
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h4" align="center" gutterBottom sx={{ color: '#592d2d' }}>
         Gestión de Usuarios
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => openDialog('create')}>
-          Crear Usuario
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2}}>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />} 
+          onClick={() => openDialog('create')}
+          sx={{
+            bgcolor: '#000000',
+            '&:hover': {
+              bgcolor: '#333333',
+            }
+          }}
+        >
+          Crear Usuarios
         </Button>
       </Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
         <Table>
-          <TableHead sx={{ backgroundColor: '#f4f4f4' }}>
+          <TableHead sx={{ backgroundColor: '#592d2d' }}>
             <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rol</TableCell>
-              <TableCell>Dirección</TableCell>
-              <TableCell>Teléfono</TableCell>
-              <TableCell align="center">Acciones</TableCell>
+              <TableCell sx={{ color: 'white' }}>Nombre</TableCell>
+              <TableCell sx={{ color: 'white' }}>Email</TableCell>
+              <TableCell sx={{ color: 'white' }}>Rol</TableCell>
+              <TableCell sx={{ color: 'white' }}>Dirección</TableCell>
+              <TableCell sx={{ color: 'white' }}>Teléfono</TableCell>
+              <TableCell align="center" sx={{ color: 'white' }}>Acciones</TableCell>
             </TableRow>
           </TableHead>
+          
           <TableBody>
             {paginatedUsers.map((user) => (
               <TableRow key={user.id}>
@@ -234,8 +245,30 @@ const AdminDashboard = () => {
         onClose={closeDialog}
         fullWidth
         maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          }
+        }}
       >
-        <DialogTitle>{dialogMode === 'create' ? 'Crear Usuario' : 'Editar Usuario'}</DialogTitle>
+        <DialogTitle sx={{ 
+          bgcolor: '#000000', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          py: 1.5
+        }}>
+          {dialogMode === 'create' ? 'Crear Usuario' : 'Editar Usuario'}
+          <IconButton 
+            onClick={closeDialog}
+            size="small"
+            sx={{ color: 'white' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <Box component="form" onSubmit={handleFormSubmit}>
           <DialogContent dividers>
             <TextField
@@ -302,9 +335,34 @@ const AdminDashboard = () => {
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
           </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDialog}>Cancelar</Button>
-            <Button type="submit" variant="contained" color="primary">
+          <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
+            <Button 
+              onClick={closeDialog}
+              sx={{
+                color: 'white',
+                bgcolor: '#000000',
+                '&:hover': {
+                  bgcolor: '#333333',
+                }
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="submit" 
+              variant="contained" 
+              sx={{
+                ml: 2,
+                color: 'white',
+                bgcolor: '#592d2d',
+                '&:hover': {
+                  bgcolor: '#8e3031',
+                },
+                '&.Mui-disabled': {
+                  bgcolor: 'rgba(89, 45, 45, 0.5)',
+                }
+              }}
+            >
               {dialogMode === 'create' ? 'Crear' : 'Guardar'}
             </Button>
           </DialogActions>
@@ -312,16 +370,49 @@ const AdminDashboard = () => {
       </Dialog>
 
       {/* Diálogo para confirmar eliminación */}
-      <Dialog open={dialogOpen && dialogMode === 'delete'} onClose={closeDialog}>
-        <DialogTitle>Eliminar Usuario</DialogTitle>
+      <Dialog 
+        open={dialogOpen && dialogMode === 'delete'} 
+        onClose={closeDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ bgcolor: '#000000', color: 'white' }}>
+          Eliminar Usuario
+        </DialogTitle>
         <DialogContent dividers>
           <Typography>
             ¿Estás seguro de eliminar a <strong>{selectedUser?.name}</strong>?
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog}>Cancelar</Button>
-          <Button onClick={handleDelete} variant="contained" color="error">
+        <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
+          <Button 
+            onClick={closeDialog}
+            sx={{
+              color: 'white',
+              bgcolor: '#000000',
+              '&:hover': {
+                bgcolor: '#333333',
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleDelete} 
+            variant="contained" 
+            sx={{
+              ml: 2,
+              color: 'white',
+              bgcolor: '#592d2d',
+              '&:hover': {
+                bgcolor: '#8e3031',
+              }
+            }}
+          >
             Eliminar
           </Button>
         </DialogActions>

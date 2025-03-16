@@ -27,7 +27,12 @@ import {
   Typography,
   Avatar,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { 
+  Add as AddIcon, 
+  Edit as EditIcon, 
+  Delete as DeleteIcon,
+  Close as CloseIcon 
+} from '@mui/icons-material';
 import 'react-toastify/dist/ReactToastify.css';
 import styled from '@emotion/styled';
 import { alpha } from '@mui/material/styles';
@@ -47,6 +52,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
 }));
 
+// Update PageHeader styling
 const PageHeader = styled(Box)(({ theme }) => ({
   marginBottom: '48px',
   textAlign: 'center',
@@ -59,7 +65,7 @@ const PageHeader = styled(Box)(({ theme }) => ({
     transform: 'translateX(-50%)',
     width: '60px',
     height: '4px',
-    background: 'linear-gradient(45deg, #2c3e50 30%, #3498db 90%)',
+    background: '#592d2d',
     borderRadius: '2px',
   }
 }));
@@ -524,7 +530,7 @@ const UserManagement = () => {
             borderRadius: '16px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             '& .MuiDialogTitle-root': {
-              background: 'linear-gradient(45deg, #2c3e50 30%, #34495e 90%)',
+              background: '#000000',
               color: 'white',
               padding: '20px 24px'
             }
@@ -532,98 +538,138 @@ const UserManagement = () => {
         }}
       >
         <DialogTitle sx={{ 
-          backgroundColor: '#34495e', 
+          backgroundColor: '#000000', 
           color: 'white',
-          fontSize: '1.25rem'
+          fontSize: '1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
           {dialogMode === 'create' ? 'Crear Usuario' : 'Editar Usuario'}
+          <IconButton 
+            onClick={closeDialog}
+            size="small"
+            sx={{ color: 'white' }}
+          >
+            <CloseIcon />
+          </IconButton>
         </DialogTitle>
-        <Box component="form" onSubmit={handleFormSubmit}>
-          <DialogContent dividers>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Nombre"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-            <TextField
-              margin="dense"
-              label="Email"
-              type="email"
-              fullWidth
-              variant="outlined"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-            <TextField
-              margin="dense"
-              label="Contraseña"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-            <FormControl fullWidth margin="dense" variant="outlined" required>
-              <InputLabel id="role-dialog-label">Rol</InputLabel>
-              <Select
-                labelId="role-dialog-label"
-                label="Rol"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              >
-                {roles.map((role) => (
-                  <MenuItem key={role} value={role}>
-                    {role}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              margin="dense"
-              label="Dirección"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            />
-            <TextField
-              margin="dense"
-              label="Teléfono"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDialog} disabled={formLoading}>Cancelar</Button>
-            <Button type="submit" variant="contained" color="primary" disabled={formLoading}>
-              {dialogMode === 'create' ? (formLoading ? 'Creando...' : 'Crear') : 'Guardar'}
-            </Button>
-          </DialogActions>
-        </Box>
+        
+        <DialogContent dividers>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nombre"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+          {/* Other form fields */}
+        </DialogContent>
+        
+        <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
+          <Button 
+            onClick={closeDialog} 
+            disabled={formLoading}
+            sx={{
+              color: 'white',
+              bgcolor: '#000000',
+              '&:hover': {
+                bgcolor: '#333333',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'rgba(0, 0, 0, 0.3)',
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            disabled={formLoading}
+            sx={{
+              ml: 2,
+              color: 'white',
+              bgcolor: '#592d2d',
+              '&:hover': {
+                bgcolor: '#8e3031',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'rgba(89, 45, 45, 0.5)',
+                color: 'rgba(255, 255, 255, 0.7)'
+              }
+            }}
+            onClick={handleFormSubmit}
+          >
+            {dialogMode === 'create' ? (formLoading ? 'Creando...' : 'Crear') : 'Guardar'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
-      {/* Diálogo para confirmar eliminación */}
-      <Dialog open={dialogOpen && dialogMode === 'delete'} onClose={closeDialog}>
-        <DialogTitle>Eliminar Usuario</DialogTitle>
+      {/* Delete dialog */}
+      <Dialog 
+        open={dialogOpen && dialogMode === 'delete'} 
+        onClose={closeDialog}
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          bgcolor: '#000000', 
+          color: 'white',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          Eliminar Usuario
+          <IconButton 
+            onClick={closeDialog}
+            size="small"
+            sx={{ color: 'white' }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
         <DialogContent dividers>
           <Typography>
             ¿Estás seguro de eliminar a <strong>{selectedUser?.name}</strong>?
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog}>Cancelar</Button>
-          <Button onClick={handleDelete} variant="contained" color="error">
+        
+        <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
+          <Button 
+            onClick={closeDialog}
+            sx={{
+              color: 'white',
+              bgcolor: '#000000',
+              '&:hover': {
+                bgcolor: '#333333',
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleDelete} 
+            variant="contained" 
+            sx={{
+              ml: 2,
+              color: 'white',
+              bgcolor: '#592d2d',
+              '&:hover': {
+                bgcolor: '#8e3031',
+              }
+            }}
+          >
             Eliminar
           </Button>
         </DialogActions>

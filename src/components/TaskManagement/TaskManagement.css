@@ -86,6 +86,7 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
+  width: 100%;
 }
 .task-card-title {
   font-weight: 600;
@@ -114,13 +115,25 @@
   align-items: center;
   gap: 8px;
 }
+/* Adjust task actions positioning */
 .task-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
+  margin-left: auto;
+  position: relative;
+  z-index: 2;
 }
 .task-date {
   color: #94a3b8;
   font-size: 0.875rem;
+}
+.delete-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  
 }
 
 /* Nombre y Icono del Proyecto */
@@ -154,8 +167,8 @@
 }
 .task-status-progress {
   background-color: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #64b5f6;
+  color: #000000;
+  border: 1px solid #000000;
 }
 .task-status-completed {
   background-color: #e8f5e9;
@@ -279,7 +292,7 @@
 }
 .stats-info-icon.project {
   background-color: rgba(33, 150, 243, 0.2);
-  color: #1976d2;
+  color: #000000;
 }
 .stats-info-icon.worker {
   background-color: rgba(156, 39, 176, 0.2);

@@ -93,7 +93,7 @@ const FaqClient = () => {
               gutterBottom
               sx={{ 
                 fontWeight: 700,
-                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                background: 'linear-gradient(45deg,rgb(0, 0, 0) 30%,rgb(0, 0, 0) 90%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}

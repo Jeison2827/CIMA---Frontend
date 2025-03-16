@@ -375,13 +375,13 @@ const ClientProjects = () => {
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ 
             fontWeight: 700,
-            background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+            background: 'linear-gradient(45deg, #8e3031 30%, #8e3031 90%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
           }}>
             Mis Proyectos
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
+          <Typography variant="subtitle1" color="#000000">
             Gestiona y visualiza el progreso de tus proyectos
           </Typography>
         </Box>
@@ -433,7 +433,7 @@ const ClientProjects = () => {
                       <LinearProgress 
                         variant="determinate" 
                         value={project.progress || 0}
-                        sx={{ height: 8, borderRadius: 4 }}
+                        sx={{ height: 8, borderRadius: 4}}
                       />
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                         <Typography variant="caption" color="text.secondary">
