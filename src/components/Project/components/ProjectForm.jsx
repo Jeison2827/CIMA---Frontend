@@ -107,11 +107,35 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
       try {
         setLoading(true);
         setError(null);
-        const clientsData = await getAllClients();
-        //console.log.log('Clientes obtenidos:', clientsData);
-        setClients(clientsData || []);
+        
+        // Use axios to fetch clients directly from the endpoint
+        const response = await axios.get('http://localhost:3000/developer/clients', {
+          headers: {
+            'accesstoken': localStorage.getItem('accessToken') // Assuming you store the token in localStorage
+          }
+        });
+        
+        // Extract clients from the response
+        const clientsData = response.data.clients || [];
+        
+        // Add detailed logging to see client data
+        console.log('Clientes obtenidos (raw data):', clientsData);
+        
+        // Transform client data to match the expected format
+        const formattedClients = clientsData.map((client, index) => ({
+          id: index + 1, // Generate an id if not provided by API
+          clientId: index + 1, // Generate a clientId if not provided by API
+          name: client.name,
+          email: client.email,
+          address: client.address
+        }));
+        
+        console.log('Clientes formateados:', formattedClients);
+        
+        setClients(formattedClients);
       } catch (error) {
         console.error('Error al cargar clientes:', error);
+        console.error('Detalles del error:', error.response?.data || error.message);
         setError('No se pudieron cargar los clientes. Por favor, inténtelo de nuevo.');
       } finally {
         setLoading(false);
@@ -121,7 +145,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
     if (open) {
       fetchClients();
     }
-  }, [open, getAllClients]);
+  }, [open]); // Removed getAllClients dependency since we're using direct API call
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -221,19 +245,27 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
                       >
                         {clients && clients.length > 0 ? (
                           clients.map(client => (
+                            // Update the client display in the MenuItem
                             <MenuItem key={client.id} value={client.id}>
-                              <Box display="flex" alignItems="center">
+                              <Box display="flex" alignItems="center" width="100%">
                                 <Avatar 
                                   sx={{ 
-                                    width: 24, 
-                                    height: 24, 
-                                    mr: 1,
-                                    bgcolor: '#592d2d' 
+                                    width: 32, 
+                                    height: 32, 
+                                    mr: 1.5,
+                                    bgcolor: client.id % 2 === 0 ? '#8e3031' : '#592d2d'
                                   }}
                                 >
-                                  {(client.name || '?')[0].toUpperCase()}
+                                  {client.name ? client.name.charAt(0).toUpperCase() : `C${client.id}`}
                                 </Avatar>
-                                {client.name}
+                                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                                  <Typography variant="body1" fontWeight="600" sx={{ color: '#592d2d' }}>
+                                    {client.name}
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary">
+                                    {client.email}
+                                  </Typography>
+                                </Box>
                               </Box>
                             </MenuItem>
                           ))

@@ -156,7 +156,7 @@ const AdminDashboard = () => {
     <Box sx={{ p: 4 }}>
       <ToastContainer />
       <Typography variant="h4" align="center" gutterBottom sx={{ color: '#592d2d' }}>
-        Gestión de Usuarios
+        Gestión de Usuariosssssssssss
       </Typography>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2}}>
         <Button 

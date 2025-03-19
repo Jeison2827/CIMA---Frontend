@@ -26,12 +26,16 @@ import {
   TextField,
   Typography,
   Avatar,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import { 
   Add as AddIcon, 
   Edit as EditIcon, 
   Delete as DeleteIcon,
-  Close as CloseIcon 
+  Close as CloseIcon,
+  People as PeopleIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
 import 'react-toastify/dist/ReactToastify.css';
 import styled from '@emotion/styled';
@@ -42,8 +46,29 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoGridOutline, IoListOutline } from 'react-icons/io5';
 import Slide from '@mui/material/Slide';
+import UsersInterface from './UsersInterface';
+import { stringToColor, adjustColor, getInitials, getPlanColor } from '../../utils/colorUtils';
+// TabPanel component to handle tab content
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
-const roles = ['Admin', 'Worker', 'Client'];
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+      style={{ width: '100%' }}
+    >
+      {value === index && (
+        <Box sx={{ pt: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 
 // Estilos personalizados usando styled-components
 const StyledBox = styled(Box)(({ theme }) => ({
@@ -176,6 +201,14 @@ const ActionButton = styled(Button)(({ variant }) => ({
 }));
 
 const UserManagement = () => {
+  // Add tab state
+  const [tabValue, setTabValue] = useState(0);
+  
+  // Fix the handleTabChange function definition
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+  
   // Extraer el token desde Redux (asegúrate de que el path sea el correcto)
   const token = useSelector((state) => state.auth.accessToken);
   // Extrae el token y el userId desde Redux
@@ -192,6 +225,7 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Estado del formulario (para crear/editar)
+  // Update the default plan value in the initial state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -199,6 +233,9 @@ const UserManagement = () => {
     role: '',
     address: '',
     phone: '',
+    contactInfo: '',
+    additionalInfo: '',
+    plan: 'Oro' // Changed from 'Básico' to 'Oro'
   });
 
   // Estado para el loading del envío del formulario
@@ -208,27 +245,27 @@ const UserManagement = () => {
   const [page, setPage] = useState(1);
   const rowsPerPage = 5;
 
-  // Verifica e imprime el token en consola
-  useEffect(() => {
-    ///console.log.log('Token desde Redux:', token);
-  }, [token]);
-
   // Obtener todos los usuarios desde la API cuando se monte el componente
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/developer/users/', {
+        setLoading(true);
+        // Changing the endpoint from /developer/clients to /clients
+        const response = await axios.get('http://localhost:3000/developer/clients', {
           headers: {
             'Content-Type': 'application/json',
-            'accesstoken': localStorage.getItem('accessToken')
+            'accesstoken': token
           }
         });
-        setUsers(response.data);
+        
+        console.log('Datos de clientes recibidos:', response.data);
+        // Make sure we're accessing the correct property in the response
+        setUsers(response.data.clients || []);
         setLoading(false);
       } catch (err) {
-        console.error(err);
-        setError('Error al cargar usuarios');
-        toast.error('Error al cargar usuarios', { position: 'top-center' });
+        console.error('Error al cargar clientes:', err);
+        setError('Error al cargar clientes');
+        toast.error('Error al cargar clientes', { position: 'top-center' });
         setLoading(false);
       }
     };
@@ -243,13 +280,30 @@ const UserManagement = () => {
   };
 
   // Función para abrir el diálogo según la acción
+  // Update the openDialog function to use 'Oro' as default
   const openDialog = (mode, user = null) => {
     setDialogMode(mode);
     setSelectedUser(user);
     if (mode === 'edit' && user) {
-      setFormData({ ...user });
+      setFormData({ 
+        ...user,
+        // Asegurarse de que todos los campos necesarios estén presentes
+        contactInfo: user.contactInfo || '',
+        additionalInfo: user.additionalInfo || '',
+        plan: user.plan || 'Oro' // Changed from 'Básico' to 'Oro'
+      });
     } else if (mode === 'create') {
-      setFormData({ name: '', email: '', password: '', role: '', address: '', phone: '' });
+      setFormData({ 
+        name: '', 
+        email: '', 
+        password: '', 
+        role: 'Client', // Por defecto, creamos clientes
+        address: '', 
+        phone: '',
+        contactInfo: '',
+        additionalInfo: '',
+        plan: 'Oro' // Changed from 'Básico' to 'Oro'
+      });
     }
     setDialogOpen(true);
   };
@@ -264,7 +318,7 @@ const UserManagement = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
   
-    // Validación mínima: nombre y email obligatorios (ajusta según tus necesidades)
+    // Validación mínima: nombre y email obligatorios
     if (!formData.name || !formData.email) {
       toast.error('Nombre y Email son obligatorios', { position: 'top-center' });
       return;
@@ -273,95 +327,132 @@ const UserManagement = () => {
     if (formLoading) return;
     setFormLoading(true);
   
-    if (dialogMode === 'edit') {
-      try {
-        // Determina el ID del usuario a actualizar (considera que puede venir como userId o id)
-        const idToUpdate = selectedUser.userId || selectedUser.id;
-        if (!idToUpdate) {
-          toast.error('ID del usuario no definido', { position: 'top-center' });
+    try {
+      if (dialogMode === 'create') {
+        // Crear nuevo cliente
+        const clientData = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          contactInfo: formData.contactInfo || formData.phone,
+          address: formData.address,
+          additionalInfo: formData.additionalInfo,
+          plan: formData.plan
+        };
+
+        // Configuración para la petición
+        const config = {
+          method: 'post',
+          url: 'http://localhost:3000/developer/clients/register',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          data: clientData
+        };
+
+        // Realizar la petición
+        const response = await axios(config);
+
+        console.log('Cliente creado:', response.data);
+        toast.success('Cliente creado exitosamente', { position: 'top-center' });
+        
+        // Actualizar la lista de usuarios
+        setUsers(prevUsers => [...prevUsers, response.data]);
+        closeDialog();
+      } else if (dialogMode === 'edit') {
+        // Determina el ID del cliente a actualizar
+        const clientId = selectedUser.clientId;
+        
+        if (!clientId) {
+          console.error('Cliente sin clientId para editar:', selectedUser);
+          toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' });
           setFormLoading(false);
           return;
         }
-  
-        // Arma el objeto con los datos actualizados
-        const updatedData = {
-          name: formData.name,
-          email: formData.email,
-          role: formData.role,
+        
+        // Datos para actualizar cliente
+        const updateData = {
+          contactInfo: formData.contactInfo || formData.phone,
+          address: formData.address,
+          additionalInfo: formData.additionalInfo,
+          plan: formData.plan
         };
-  
-        // Si se ingresa una nueva contraseña, se envía
-        if (formData.password && formData.password.trim() !== '') {
-          updatedData.password = formData.password;
-        }
-  
-        // Envía la petición PUT al backend para actualizar el usuario
-        const response = await axios.put(
-          `http://localhost:3000/developer/users/${idToUpdate}`,
-          updatedData,
+
+        // Actualizar cliente existente con el endpoint correcto usando clientId
+        await axios.put(
+          `http://localhost:3000/developer/clients/${clientId}`,
+          updateData,
           {
             headers: {
               'Content-Type': 'application/json',
-              'accesstoken': token,
-            },
+              'accesstoken': token
+            }
           }
         );
-  
-        // Actualiza el estado local (actualizando la tabla) para reflejar los nuevos datos
-        const updatedUsers = users.map((user) => {
-          const currentUserId = user.userId || user.id;
-          if (currentUserId === idToUpdate) {
-            return { ...user, ...updatedData };
+
+        // Actualizar el estado local usando clientId
+        const updatedUsers = users.map(user => {
+          if (user.clientId === clientId) {
+            return { ...user, ...updateData };
           }
           return user;
         });
+        
         setUsers(updatedUsers);
-  
-        toast.success('Usuario actualizado exitosamente', { position: 'top-center' });
+        toast.success('Cliente actualizado exitosamente', { position: 'top-center' });
         closeDialog();
-      } catch (err) {
-        console.error(err);
-        toast.error('Error al actualizar usuario', { position: 'top-center' });
-        setFormLoading(false);
       }
+    } catch (err) {
+      console.error('Error en la operación:', err);
+      toast.error(`Error: ${err.response?.data?.message || 'Ocurrió un problema'}`, { position: 'top-center' });
+    } finally {
+      setFormLoading(false);
     }
   };
   
   const handleDelete = async () => {
     if (!selectedUser) {
-      toast.error('No se ha seleccionado ningún usuario para eliminar', { position: 'top-center' });
+      toast.error('No se ha seleccionado ningún cliente para eliminar', { position: 'top-center' });
       return;
     }
   
-    // Usamos selectedUser.userId o selectedUser.id, según como venga desde la API
-    const idToDelete = selectedUser.userId || selectedUser.id;
-    if (!idToDelete) {
-      toast.error('El usuario seleccionado no tiene un ID definido', { position: 'top-center' });
+    // Log the entire user object to see its structure
+    console.log('Selected user for deletion:', selectedUser);
+    
+    // Use clientId for deletion, not userId
+    const clientId = selectedUser.clientId;
+    
+    if (!clientId) {
+      console.error('Cliente sin clientId:', selectedUser);
+      toast.error('El cliente seleccionado no tiene un ID definido', { position: 'top-center' });
       return;
     }
   
+    await deleteClient(clientId);
+  };
+  
+  // Helper function to handle the actual deletion
+  const deleteClient = async (clientId) => {
     try {
-      // Se envía la solicitud DELETE con el ID en el parámetro de la URL
-      await axios.delete(`http://localhost:3000/developer/users/${idToDelete}`, {
+      console.log('Attempting to delete client with ID:', clientId);
+      
+      // Eliminar cliente con el endpoint correcto usando clientId
+      await axios.delete(`http://localhost:3000/developer/clients/${clientId}`, {
         headers: {
           'Content-Type': 'application/json',
-          'accesstoken': token,
+          'accesstoken': token
         }
       });
   
-      // Se actualiza el estado eliminando el usuario borrado
-      const updatedUsers = users.filter((user) => {
-        // Considera que el usuario puede tener la propiedad "userId" o "id"
-        const currentUserId = user.userId || user.id;
-        return currentUserId !== idToDelete;
-      });
+      // Actualizar estado local - use clientId for matching
+      const updatedUsers = users.filter(user => user.clientId !== clientId);
+      
       setUsers(updatedUsers);
-  
-      toast.success('Usuario eliminado correctamente', { position: 'top-center' });
+      toast.success('Cliente eliminado correctamente', { position: 'top-center' });
       closeDialog();
     } catch (error) {
-      console.error(error);
-      toast.error('Error al eliminar usuario', { position: 'top-center' });
+      console.error('Error al eliminar cliente:', error);
+      toast.error(`Error al eliminar cliente: ${error.response?.data?.message || error.message}`, { position: 'top-center' });
     }
   };
   
@@ -393,133 +484,199 @@ const UserManagement = () => {
         </Typography>
       </PageHeader>
 
-      <EnhancedTableContainer>
-        <TableToolbar>
-          <SearchBar>
-            <SearchIcon />
-            <TextField
-              placeholder="Buscar usuario..."
-              variant="standard"
-              InputProps={{
-                disableUnderline: true,
+      {/* Tabs */}
+      <Box sx={{ 
+        width: '100%', 
+        bgcolor: 'background.paper',
+        borderRadius: '10px',
+        boxShadow: '0 0 20px 0 rgba(82, 63, 105, 0.1)',
+        mb: 3
+      }}>
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          centered
+          sx={{
+            '& .MuiTabs-indicator': {
+              backgroundColor: '#592d2d',
+            },
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: '#7e8299',
+              '&.Mui-selected': {
+                color: '#592d2d',
+                fontWeight: 600,
+              },
+            },
+          }}
+        >
+          <Tab 
+            icon={<PersonIcon />} 
+            iconPosition="start" 
+            label="Clientes" 
+          />
+          <Tab 
+            icon={<PeopleIcon />} 
+            iconPosition="start" 
+            label="Usuarios" 
+          />
+        </Tabs>
+      </Box>
+
+      {/* Tab Panels */}
+      <TabPanel value={tabValue} index={0}>
+        {/* Clients Tab Content - Your existing client management UI */}
+        <EnhancedTableContainer>
+          <TableToolbar>
+            <SearchBar>
+              <SearchIcon />
+              <TextField
+                placeholder="Buscar cliente..."
+                variant="standard"
+                InputProps={{
+                  disableUnderline: true,
+                }}
+              />
+            </SearchBar>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="contained"
+                startIcon={<FilterListIcon />}
+               
+              >
+                Filtrar
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => openDialog('create')}
+                sx={{
+                  background: 'linear-gradient(135deg,rgb(0, 0  , 0) 0%,rgb(0, 0, 0) 100%)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(207, 215, 224) 100%)',
+                  },
+                }}
+              >
+                Nuevo Cliente
+              </Button>
+            </Box>
+          </TableToolbar>
+
+          {/* Rest of your client table code... */}
+          <Table>
+            <StyledTableHead>
+              <TableRow>
+                <TableCell>Usuario</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Rol</TableCell>
+                <TableCell>Plan</TableCell>
+                <TableCell>Dirección</TableCell>
+                <TableCell>Teléfono</TableCell>
+                <TableCell align="right">Acciones</TableCell>
+              </TableRow>
+            </StyledTableHead>
+            <TableBody>
+              {currentUsers.map((user, index) => {
+                const userKey = user.id || user.userId || user.user_id || user._id || `user-${index}`;
+                
+                return (
+                  <StyledTableRow key={userKey}>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Avatar sx={{ 
+                          background: user.name 
+                            ? `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`
+                            : 'linear-gradient(135deg, #000000 0%, #333333 100%)',
+                        }}>
+                          {getInitials(user.name)}
+                        </Avatar>
+                        <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
+                          {user.name}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <StatusChip status={user.role}>
+                        {user.role}
+                      </StatusChip>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ 
+                        display: 'inline-block',
+                        px: 2,
+                        py: 0.5,
+                        borderRadius: '4px',
+                        bgcolor: getPlanColor(user.plan),
+                        color: 'white',
+                        fontWeight: 'medium'
+                      }}>
+                        {user.plan || 'Oro'}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{user.address}</TableCell>
+                    <TableCell>{user.phone || user.contactInfo}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        onClick={() => openDialog('edit', user)}
+                        sx={{ color: '#592d2d' }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => openDialog('delete', user)}
+                        sx={{ color: '#f1416c' }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </StyledTableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+
+          <Box sx={{ 
+            padding: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderTop: '1px solid #ebedf3',
+          }}>
+            <Typography sx={{ color: '#7e8299' }}>
+              Mostrando {currentUsers.length} de {users.length} usuarios
+            </Typography>
+            <Pagination
+              count={Math.ceil(users.length / rowsPerPage)}
+              page={page}
+              onChange={handlePageChange}
+              variant="outlined"
+              shape="rounded"
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  borderColor: '#e9ecef',
+                  color: '#7e8299',
+                  '&.Mui-selected': {
+                    background: '#f3f6f9',
+                    borderColor: '#3699ff',
+                    color: '#3699ff',
+                  },
+                },
               }}
             />
-          </SearchBar>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<FilterListIcon />}
-              sx={{
-                background: '#f3f6f9',
-                color: '#7e8299',
-                '&:hover': { background: '#e9ecef' },
-              }}
-            >
-              Filtrar
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => openDialog('create')}
-              sx={{
-                background: 'linear-gradient(135deg,rgb(0, 0  , 0) 0%,rgb(0, 0, 0) 100%)',
-                color: 'white',
-                '&:hover': {
-                  background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(207, 215, 224) 100%)',
-                },
-              }}
-            >
-              Nuevo Usuario
-            </Button>
           </Box>
-        </TableToolbar>
+        </EnhancedTableContainer>
+      </TabPanel>
 
-        <Table>
-          <StyledTableHead>
-            <TableRow>
-              <TableCell>Usuario</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rol</TableCell>
-              <TableCell>Dirección</TableCell>
-              <TableCell>Teléfono</TableCell>
-              <TableCell align="right">Acciones</TableCell>
-            </TableRow>
-          </StyledTableHead>
-          <TableBody>
-            {currentUsers.map((user) => (
-              <StyledTableRow key={user.id}>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar sx={{ 
-                      background: `linear-gradient(135deg, ${stringToColor(user.name)} 0%, ${adjustColor(stringToColor(user.name), -20)} 100%)`,
-                    }}>
-                      {getInitials(user.name)}
-                    </Avatar>
-                    <Typography sx={{ color: '#3f4254', fontWeight: 500 }}>
-                      {user.name}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <StatusChip status={user.role}>
-                    {user.role}
-                  </StatusChip>
-                </TableCell>
-                <TableCell>{user.address}</TableCell>
-                <TableCell>{user.phone}</TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    onClick={() => openDialog('edit', user)}
-                    sx={{ color: '#592d2d' }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => openDialog('delete', user)}
-                    sx={{ color: '#f1416c' }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                  
-                </TableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <TabPanel value={tabValue} index={1}>
+        {/* Users Tab Content - Import from UsersInterface component */}
+        <UsersInterface token={token} />
+      </TabPanel>
 
-        <Box sx={{ 
-          padding: '20px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderTop: '1px solid #ebedf3',
-        }}>
-          <Typography sx={{ color: '#7e8299' }}>
-            Mostrando {currentUsers.length} de {users.length} usuarios
-          </Typography>
-          <Pagination
-            count={Math.ceil(users.length / rowsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            variant="outlined"
-            shape="rounded"
-            sx={{
-              '& .MuiPaginationItem-root': {
-                borderColor: '#e9ecef',
-                color: '#7e8299',
-                '&.Mui-selected': {
-                  background: '#f3f6f9',
-                  borderColor: '#3699ff',
-                  color: '#3699ff',
-                },
-              },
-            }}
-          />
-        </Box>
-      </EnhancedTableContainer>
-
-      {/* Diálogo mejorado */}
+      {/* Your existing dialogs */}
       <Dialog
         open={dialogOpen && (dialogMode === 'create' || dialogMode === 'edit')}
         onClose={closeDialog}
@@ -537,77 +694,105 @@ const UserManagement = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          backgroundColor: '#000000', 
-          color: 'white',
-          fontSize: '1.25rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          {dialogMode === 'create' ? 'Crear Usuario' : 'Editar Usuario'}
-          <IconButton 
+        <DialogTitle>
+          {dialogMode === 'create' ? 'Crear Nuevo Cliente' : 'Editar Cliente'}
+          <IconButton
+            aria-label="close"
             onClick={closeDialog}
-            size="small"
-            sx={{ color: 'white' }}
+            sx={{
+              position: 'absolute',
+              right: 16,
+              top: 16,
+              color: 'white',
+            }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
-        <DialogContent dividers>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nombre"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
-          {/* Other form fields */}
+        <DialogContent sx={{ padding: '24px' }}>
+          <Box component="form" onSubmit={handleFormSubmit} sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Nombre"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              margin="normal"
+              disabled={dialogMode === 'edit'}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              margin="normal"
+              disabled={dialogMode === 'edit'}
+              required
+            />
+            {dialogMode === 'create' && (
+              <TextField
+                fullWidth
+                label="Contraseña"
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                margin="normal"
+                required
+              />
+            )}
+            <TextField
+              fullWidth
+              label="Dirección"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Teléfono"
+              value={formData.phone || formData.contactInfo}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value, contactInfo: e.target.value })}
+              margin="normal"
+            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Plan</InputLabel>
+              <Select
+                value={formData.plan || 'Oro'}
+                onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+                label="Plan"
+              >
+                <MenuItem value="Oro">Oro</MenuItem>
+                <MenuItem value="Esmeralda">Esmeralda</MenuItem>
+                <MenuItem value="Premium">Premium</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              label="Información Adicional"
+              value={formData.additionalInfo}
+              onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
+              margin="normal"
+              multiline
+              rows={3}
+            />
+          </Box>
         </DialogContent>
-        
-        <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
-          <Button 
-            onClick={closeDialog} 
-            disabled={formLoading}
-            sx={{
-              color: 'white',
-              bgcolor: '#000000',
-              '&:hover': {
-                bgcolor: '#333333',
-              },
-              '&.Mui-disabled': {
-                bgcolor: 'rgba(0, 0, 0, 0.3)',
-                color: 'rgba(255, 255, 255, 0.7)'
-              }
-            }}
-          >
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
             Cancelar
           </Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
-            disabled={formLoading}
-            sx={{
-              ml: 2,
-              color: 'white',
-              bgcolor: '#592d2d',
-              '&:hover': {
-                bgcolor: '#8e3031',
-              },
-              '&.Mui-disabled': {
-                bgcolor: 'rgba(89, 45, 45, 0.5)',
-                color: 'rgba(255, 255, 255, 0.7)'
-              }
-            }}
+          <ActionButton 
+            variant="create" 
             onClick={handleFormSubmit}
+            disabled={formLoading}
           >
-            {dialogMode === 'create' ? (formLoading ? 'Creando...' : 'Crear') : 'Guardar'}
-          </Button>
+            {formLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              dialogMode === 'create' ? 'Crear Cliente' : 'Guardar Cambios'
+            )}
+          </ActionButton>
         </DialogActions>
       </Dialog>
 
@@ -622,89 +807,43 @@ const UserManagement = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          bgcolor: '#000000', 
-          color: 'white',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          Eliminar Usuario
-          <IconButton 
+        <DialogTitle sx={{ background: '#f1416c', color: 'white' }}>
+          Confirmar Eliminación
+          <IconButton
+            aria-label="close"
             onClick={closeDialog}
-            size="small"
-            sx={{ color: 'white' }}
+            sx={{
+              position: 'absolute',
+              right: 16,
+              top: 16,
+              color: 'white',
+            }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        
-        <DialogContent dividers>
-          <Typography>
-            ¿Estás seguro de eliminar a <strong>{selectedUser?.name}</strong>?
+        <DialogContent sx={{ padding: '24px', paddingTop: '24px' }}>
+          <Typography variant="body1">
+            ¿Estás seguro de que deseas eliminar al cliente <strong>{selectedUser?.name}</strong>?
+            Esta acción no se puede deshacer.
           </Typography>
         </DialogContent>
-        
-        <DialogActions sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
-          <Button 
-            onClick={closeDialog}
-            sx={{
-              color: 'white',
-              bgcolor: '#000000',
-              '&:hover': {
-                bgcolor: '#333333',
-              }
-            }}
-          >
+        <DialogActions sx={{ padding: '16px 24px' }}>
+          <Button onClick={closeDialog} sx={{ color: '#7e8299' }}>
             Cancelar
           </Button>
-          <Button 
-            onClick={handleDelete} 
-            variant="contained" 
-            sx={{
-              ml: 2,
-              color: 'white',
-              bgcolor: '#592d2d',
-              '&:hover': {
-                bgcolor: '#8e3031',
-              }
-            }}
+          <ActionButton 
+            variant="delete" 
+            onClick={handleDelete}
           >
-            Eliminar
-          </Button>
+            Eliminar Cliente
+          </ActionButton>
         </DialogActions>
       </Dialog>
     </StyledBox>
   );
 };
 
+  
+
 export default UserManagement;
-
-// Funciones auxiliares
-const stringToColor = (string) => {
-  let hash = 0;
-  for (let i = 0; i < string.length; i++) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = '#';
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  return color;
-};
-
-const adjustColor = (color, amount) => {
-  return '#' + color.replace(/^#/, '').replace(/../g, color => 
-    ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).slice(-2)
-  );
-};
-
-const getInitials = (name) => {
-  return name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};

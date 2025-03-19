@@ -25,7 +25,40 @@ export const taskService = {
     return response.data;
   },
 
+  async createOrUpdateTask(task) {
+    // If task has an ID, update it; otherwise, create a new task
+    if (task.id || task.taskId) {
+      const taskId = task.id || task.taskId;
+      console.log('Updating existing task:', taskId);
+      return this.updateTask(taskId, task);
+    } else {
+      console.log('Creating new task as no ID was provided');
+      return this.createTask(task);
+    }
+  },
+
+  async updateTaskStatus(taskId, status) {
+    if (!taskId) {
+      console.error('Error: taskId is undefined or null');
+      throw new Error('Task ID is required');
+    }
+    
+    console.log('API Request - Update Task Status:', taskId, status);
+    const response = await axios.put(
+      `${API_URL}/${taskId}/status`, 
+      { status }, 
+      getHeaders()
+    );
+    console.log('API Response - Update Task Status:', response.data);
+    return response.data;
+  },
+
   async updateTask(id, task) {
+    if (!id) {
+      console.error('Error: Task ID is undefined or null', task);
+      throw new Error('Task ID is required');
+    }
+    
     console.log('API Request - Update Task:', id, task);
     const response = await axios.put(`${API_URL}/${id}`, task, getHeaders());
     console.log('API Response - Update Task:', response.data);

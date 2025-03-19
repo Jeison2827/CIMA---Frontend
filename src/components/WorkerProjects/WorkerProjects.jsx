@@ -46,6 +46,7 @@ import {
   Description as DescriptionIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { taskService } from '../../services/taskService';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
@@ -287,11 +288,8 @@ const WorkerProjects = () => {
 
   const handleUpdateTaskStatus = async () => {
     try {
-      await axios.put(
-        `http://localhost:3000/developer/projects/tasks/${selectedTask.taskId}/status`,
-        { status: newTaskStatus },
-        { headers: { 'accesstoken': accessToken } }
-      );
+      // Use taskService instead of direct axios call
+      await taskService.updateTaskStatus(selectedTask.taskId, newTaskStatus);
       
       // Refresh tasks after update
       await fetchProjectTasks(selectedProjectTasks);

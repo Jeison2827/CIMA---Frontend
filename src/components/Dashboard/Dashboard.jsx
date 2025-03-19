@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import WorkerDashboard from './WorkerDashboard';
 import ClientDashboard from './ClientDashboard';
-import AdminDashboard from './AdminDashboard';
+import AdminDashboard from './admindashboard';
 import ExcelImport from '../Excel/ExcelImport';
 import ExcelExport from '../Excel/ExcelExport';
 import ProjectStatus from '../ProjectStatus/ProjectStatus'; 

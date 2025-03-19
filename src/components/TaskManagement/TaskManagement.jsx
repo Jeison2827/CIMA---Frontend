@@ -318,32 +318,57 @@ const handleOpen = (task = null) => {
     setOpen(false);
     setSelectedTask(null);
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (selectedTask) {
-        console.log('Updating task:', selectedTask.id, 'with data:', formData);
-        const response = await taskService.updateTask(selectedTask.id, formData);
-        console.log('Update task response:', response);
-        toast.success('Tarea actualizada exitosamente');
-      } else {
-        console.log('Creating new task with data:', formData);
-        const response = await taskService.createTask(formData);
-        console.log('Create task response:', response);
-        toast.success('Tarea creada exitosamente');
-      }
-      handleClose();
-      loadTasks(); // Recargar tareas
-    } catch (error) {
-      console.error('Error al procesar la tarea:', error);
-      console.error('Error details:', error.response?.data || error.message);
-      toast.error('Error al procesar la tarea');
-    } finally {
-      setLoading(false);
+// In the handleSubmit function, replace the existing code with this:
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    console.log('Processing task with data:', formData);
+    
+    let response;
+    if (selectedTask) {
+      // For updates, make sure we include the task ID
+      const taskId = selectedTask.id || selectedTask.taskId;
+      console.log('Updating task:', taskId, 'with data:', formData);
+      
+      // Use the createOrUpdateTask method which handles both cases
+      response = await taskService.createOrUpdateTask({
+        ...formData,
+        id: taskId, // Include the ID in the data
+        taskId: taskId // Include both ID formats to be safe
+      });
+    } else {
+      // For new tasks, just pass the form data
+      console.log('Creating new task with data:', formData);
+      response = await taskService.createTask(formData);
     }
-  };
+    
+    console.log('Task processed successfully:', response);
+    
+    // Reset form and close dialog
+    setFormData({
+      projectId: '',
+      workerId: '',
+      description: '',
+      status: 'Pending'
+    });
+    setOpen(false);
+    setSelectedTask(null);
+    
+    // Refresh task list
+    loadTasks();
+    
+    // Show success message
+    toast.success(selectedTask ? 'Tarea actualizada con éxito' : 'Tarea creada con éxito');
+  } catch (error) {
+    console.error('Error al procesar la tarea:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    toast.error(`Error: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Está seguro de eliminar esta tarea?')) {

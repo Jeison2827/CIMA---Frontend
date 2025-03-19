@@ -51,6 +51,7 @@ const StatCard = ({ title, value, icon, color }) => (
 );
 
 const ProjectStats = ({ stats }) => {
+  console.log(stats)
   const {
     total = 0,
     completed = 0,
