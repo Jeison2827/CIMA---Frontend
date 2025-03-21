@@ -317,42 +317,68 @@ const UserManagement = () => {
       toast.error('Nombre y Email son obligatorios', { position: 'top-center' });
       return;
     }
+
+    // Validar que la contraseña esté presente para creación
+    if (dialogMode === 'create' && !formData.password) {
+      toast.error('La contraseña es obligatoria para crear un cliente', { position: 'top-center' });
+      return;
+    }
   
     if (formLoading) return;
     setFormLoading(true);
   
     try {
       if (dialogMode === 'create') {
-        // Crear nuevo cliente
+        // Crear nuevo cliente - usando un objeto directo en lugar de JSON.stringify
         const clientData = {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          contactInfo: formData.contactInfo || formData.phone,
-          address: formData.address,
-          additionalInfo: formData.additionalInfo,
-          plan: formData.plan
+          role: 'Client'
         };
 
-        // Configuración para la petición
-        const config = {
+        // Solo agregar campos opcionales si tienen valor
+        if (formData.contactInfo || formData.phone) {
+          clientData.contactInfo = formData.contactInfo || formData.phone;
+        }
+        if (formData.address) {
+          clientData.address = formData.address;
+        }
+        if (formData.additionalInfo) {
+          clientData.additionalInfo = formData.additionalInfo;
+        }
+        if (formData.plan) {
+          clientData.plan = formData.plan;
+        }
+
+        console.log('Datos a enviar:', clientData);
+        
+        // Usar axios directamente sin config
+        const response = await axios({
           method: 'post',
           url: 'http://localhost:3000/developer/clients/register',
           headers: { 
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'accesstoken': token
           },
           data: clientData
-        };
-
-        // Realizar la petición
-        const response = await axios(config);
-
+        });
+        
         console.log('Cliente creado:', response.data);
         toast.success('Cliente creado exitosamente', { position: 'top-center' });
         
-        // Actualizar la lista de usuarios
-        setUsers(prevUsers => [...prevUsers, response.data]);
+        // Actualizar la lista de usuarios y refrescar la lista
+        setUsers(prevUsers => [...prevUsers, response.data.client || response.data]);
         closeDialog();
+        
+        // Refrescar la lista de clientes después de crear uno nuevo
+        const refreshResponse = await axios.get('http://localhost:3000/developer/clients', {
+          headers: {
+            'Content-Type': 'application/json',
+            'accesstoken': token
+          }
+        });
+        setUsers(refreshResponse.data.clients || []);
       } else if (dialogMode === 'edit') {
         // Determina el ID del cliente a actualizar
         const clientId = selectedUser.clientId;

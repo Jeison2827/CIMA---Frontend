@@ -48,6 +48,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { taskService } from '../../services/taskService';
 
+// Update the StyledCard component to use the burgundy color
 const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
@@ -66,7 +67,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
     left: 0,
     right: 0,
     height: '4px',
-    background: theme.palette.primary.main,
+    background: '#8e3031', // Changed to burgundy color
     borderRadius: '4px 4px 0 0',
   },
 }));
@@ -124,7 +125,7 @@ const StyledModal = styled(Modal)(({ theme }) => ({
 
 // Add this new styled component
 const ModalHeader = styled(Box)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+  background: `linear-gradient(135deg, #8e3031 0%, #592d2d 100%)`, // Changed to burgundy gradient
   padding: theme.spacing(3),
   color: theme.palette.primary.contrastText,
   position: 'relative',
@@ -307,7 +308,7 @@ const WorkerProjects = () => {
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom sx={{ 
           fontWeight: 700,
-          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+          background: 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)', // Changed to burgundy gradient
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
@@ -338,7 +339,6 @@ const WorkerProjects = () => {
         {/* ... Dialog content ... */}
       </Dialog>
 
-      // Update the modal content in the return statement
       <StyledModal open={tasksModalOpen} onClose={handleCloseTasksModal}>
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
           <ModalHeader>
