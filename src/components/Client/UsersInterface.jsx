@@ -78,10 +78,11 @@ const SearchBar = styled('div')(({ theme }) => ({
   },
 }));
 
+// Update the StyledTableHead component to use your color scheme
 const StyledTableHead = styled(TableHead)(({ theme }) => ({
   '& .MuiTableCell-head': {
-    background: '#f3f6f9',
-    color: '#592d2d',
+    background: '#8e3031',
+    color: '#ffffff',
     fontWeight: 600,
     fontSize: '0.95rem',
     padding: '16px 24px',
@@ -90,17 +91,19 @@ const StyledTableHead = styled(TableHead)(({ theme }) => ({
   },
 }));
 
+// Add the StyledTableRow component
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:hover': {
-    background: alpha('#f3f6f9', 0.3),
+    backgroundColor: alpha('#f3f6f9', 0.7),
   },
   '& .MuiTableCell-root': {
     padding: '16px 24px',
     borderBottom: '1px solid #ebedf3',
-    color: '#7e8299',
+    color: '#464E5F',
   },
 }));
 
+// Update the StatusChip component colors
 const StatusChip = styled(Box)(({ status }) => ({
   padding: '6px 12px',
   borderRadius: '6px',
@@ -109,12 +112,12 @@ const StatusChip = styled(Box)(({ status }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   ...(status === 'Admin' && {
-    background: alpha('#50cd89', 0.1),
-    color: '#50cd89',
+    background: alpha('#8e3031', 0.1),
+    color: '#8e3031',
   }),
   ...(status === 'Worker' && {
-    background: alpha('#009ef7', 0.1),
-    color: '#009ef7',
+    background: alpha('#592d2d', 0.1),
+    color: '#592d2d',
   }),
   ...(status === 'Client' && {
     background: alpha('#f1416c', 0.1),
@@ -122,12 +125,13 @@ const StatusChip = styled(Box)(({ status }) => ({
   }),
 }));
 
+// Update the ActionButton component colors
 const ActionButton = styled(Button)(({ variant }) => ({
   background: variant === 'create' 
-    ? 'linear-gradient(45deg, #3498db 30%, #2980b9 90%)'
+    ? 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)'
     : 'linear-gradient(45deg, #e74c3c 30%, #c0392b 90%)',
   boxShadow: variant === 'create'
-    ? '0 3px 5px 2px rgba(52, 152, 219, .3)'
+    ? '0 3px 5px 2px rgba(142, 48, 49, .3)'
     : '0 3px 5px 2px rgba(231, 76, 60, .3)',
   borderRadius: '8px',
   padding: '10px 25px',
@@ -136,7 +140,7 @@ const ActionButton = styled(Button)(({ variant }) => ({
   fontWeight: 600,
   '&:hover': {
     background: variant === 'create'
-      ? 'linear-gradient(45deg, #2980b9 30%, #2c3e50 90%)'
+      ? 'linear-gradient(45deg, #592d2d 30%, #3d1e1e 90%)'
       : 'linear-gradient(45deg, #c0392b 30%, #a93226 90%)',
   }
 }));
@@ -239,6 +243,12 @@ const UsersInterface = ({ token }) => {
       toast.error('Nombre, Email y Rol son obligatorios', { position: 'top-center' });
       return;
     }
+    
+    // Validación adicional para contraseña en modo creación
+    if (dialogMode === 'create' && !formData.password) {
+      toast.error('La contraseña es obligatoria para crear un usuario', { position: 'top-center' });
+      return;
+    }
   
     if (formLoading) return;
     setFormLoading(true);
@@ -250,10 +260,10 @@ const UsersInterface = ({ token }) => {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: formData.role,
-          department: formData.department,
-          position: formData.position
+          role: formData.role
         };
+
+        console.log('Creando usuario con datos:', userData);
 
         // Configuración para la petición
         const response = await axios.post(
@@ -268,13 +278,23 @@ const UsersInterface = ({ token }) => {
         );
 
         console.log('Usuario creado:', response.data);
-        toast.success('Usuario creado exitosamente', { position: 'top-center' });
+        
+        // Check the structure of the response and extract the user data
+        const newUser = response.data.user || response.data;
+        
+        // Make sure the user object has an id property that can be used as userId
+        const userWithId = {
+          ...newUser,
+          userId: newUser.userId || newUser.id || Date.now().toString() // Fallback to timestamp if no ID
+        };
         
         // Actualizar la lista de usuarios
-        setStaffUsers(prevUsers => [...prevUsers, response.data.user]);
+        setStaffUsers(prevUsers => [...prevUsers, userWithId]);
+        toast.success('Usuario creado exitosamente', { position: 'top-center' });
         closeDialog();
       } else if (dialogMode === 'edit') {
-        // Determina el ID del usuario a actualizar
+        // Código existente para editar...
+        // Determine the ID of the user to update
         const userId = selectedUser.userId || selectedUser.id;
         
         if (!userId) {
@@ -284,36 +304,51 @@ const UsersInterface = ({ token }) => {
           return;
         }
         
-        // Datos para actualizar usuario
-        const updateData = {
-          role: formData.role,
-          department: formData.department,
-          position: formData.position
-        };
-
-        // Actualizar usuario existente
-        await axios.put(
-          `http://localhost:3000/developer/users/${userId}`,
-          updateData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'accesstoken': token
+        try {
+          // Prepare data for user update
+          const updateData = {
+            name: formData.name,
+            email: formData.email,
+            role: formData.role
+          };
+          
+          // If password is provided, include it in the update
+          if (formData.password && formData.password.trim() !== '') {
+            updateData.password = formData.password;
+          }
+          
+          console.log('Updating user with data:', updateData);
+          
+          // Update user using the correct endpoint
+          const response = await axios.put(
+            `http://localhost:3000/developer/users/${userId}`,
+            updateData,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'accesstoken': token
+              }
             }
-          }
-        );
-
-        // Actualizar el estado local
-        const updatedUsers = staffUsers.map(user => {
-          if ((user.userId || user.id) === userId) {
-            return { ...user, ...updateData };
-          }
-          return user;
-        });
-        
-        setStaffUsers(updatedUsers);
-        toast.success('Usuario actualizado exitosamente', { position: 'top-center' });
-        closeDialog();
+          );
+          
+          console.log('User updated successfully:', response.data);
+          
+          // Update the local state
+          const updatedUsers = staffUsers.map(user => {
+            if ((user.userId || user.id) === userId) {
+              return { ...user, ...updateData };
+            }
+            return user;
+          });
+          
+          setStaffUsers(updatedUsers);
+          toast.success('Usuario actualizado exitosamente', { position: 'top-center' });
+          closeDialog();
+        } catch (error) {
+          console.error('Error updating user:', error);
+          toast.error(`Error al actualizar usuario: ${error.response?.data?.message || error.message}`, { position: 'top-center' });
+          setFormLoading(false);
+        }
       }
     } catch (err) {
       console.error('Error en la operación:', err);
@@ -534,7 +569,7 @@ const UsersInterface = ({ token }) => {
               borderRadius: '16px',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
               '& .MuiDialogTitle-root': {
-                background: '#000000',
+                background: '#8e3031',
                 color: 'white',
                 padding: '20px 24px'
               }
@@ -564,7 +599,6 @@ const UsersInterface = ({ token }) => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 margin="normal"
-                disabled={dialogMode === 'edit'}
                 required
               />
               <TextField
@@ -574,10 +608,9 @@ const UsersInterface = ({ token }) => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 margin="normal"
-                disabled={dialogMode === 'edit'}
                 required
               />
-              {dialogMode === 'create' && (
+              {dialogMode === 'create' ? (
                 <TextField
                   fullWidth
                   label="Contraseña"
@@ -586,6 +619,16 @@ const UsersInterface = ({ token }) => {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   margin="normal"
                   required
+                />
+              ) : (
+                <TextField
+                  fullWidth
+                  label="Nueva Contraseña (opcional)"
+                  type="password"
+                  value={formData.password || ''}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  margin="normal"
+                  helperText="Deja en blanco para mantener la contraseña actual"
                 />
               )}
               <FormControl fullWidth margin="normal">

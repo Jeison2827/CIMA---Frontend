@@ -44,6 +44,16 @@ import {
 // Add these imports at the top
 import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 
+// Create theme outside the component
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#8e3031',
+      dark: '#592d2d',
+    },
+  },
+});
+
 const ClientProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -146,7 +156,7 @@ const ClientProjects = () => {
                 </Typography>
                 <Typography variant="body1">
                   {selectedProject.description || 'Sin descripción disponible'}
-                </Typography>
+                </Typography> 
               </Paper>
             </Grid>
 
@@ -177,11 +187,14 @@ const ClientProjects = () => {
                         <LinearProgress 
                           variant="determinate" 
                           value={selectedProject.progress || 0}
-                          sx={{ 
-                            flexGrow: 1, 
-                            height: 10, 
-                            borderRadius: 5,
-                            bgcolor: 'rgba(0,0,0,0.1)',
+                          sx={{
+                            height: 8,
+                            borderRadius: 4,
+                            mb: 1,
+                            bgcolor: 'rgba(142, 48, 49, 0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              bgcolor: '#8e3031'
+                            }
                           }}
                         />
                         <Typography variant="h6" sx={{ minWidth: 45 }}>
@@ -368,9 +381,9 @@ const ClientProjects = () => {
     );
   }
 
-  // Wrap the return statement with ThemeProvider
+  // Wrap the return statement with ThemeProvider using the defined theme
   return (
-    <ThemeProvider theme={createTheme()}>
+    <ThemeProvider theme={theme}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ 
@@ -395,70 +408,126 @@ const ClientProjects = () => {
         <Grid container spacing={3}>
           {projects.map((project) => (
             <Grid item xs={12} sm={6} md={4} key={project.projectId}>
-              <Fade in timeout={300}>
-                <Card sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.3s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: 6,
-                  },
-                }}>
+              <Fade in={true} timeout={300}>
+                <Card 
+                  elevation={3} 
+                  sx={{ 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-5px)',
+                      boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+                    },
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    border: '1px solid #ebedf3'
+                  }}
+                >
+                  {/* Project status indicator */}
+                  <Box 
+                    sx={{ 
+                      height: '8px', 
+                      bgcolor: project.status === 'Completed' 
+                        ? '#10b981' 
+                        : project.status === 'In Progress' 
+                          ? '#8e3031' 
+                          : '#f59e0b' 
+                    }} 
+                  />
+                  
+                  {/* Card content */}
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ProjectIcon color="primary" />
-                        <Typography variant="h6" component="h2">
-                          {project.projectName}
-                        </Typography>
-                      </Box>
-                      <Chip
-                        label={project.status}
-                        color={getStatusColor(project.status)}
-                        size="small"
-                      />
-                    </Box>
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      <DescriptionIcon sx={{ fontSize: 16, mr: 1, verticalAlign: 'text-bottom' }} />
-                      {project.description || 'Sin descripción disponible'}
+                    {/* Project title */}
+                    <Typography 
+                      variant="h5" 
+                      component="h2" 
+                      gutterBottom 
+                      sx={{ 
+                        fontWeight: 600,
+                        color: '#3f4254',
+                        mb: 2,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                      }}
+                    >
+                      <ProjectIcon fontSize="small" sx={{ color: '#8e3031' }} />
+                      {project.projectName || project.name}
                     </Typography>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="primary" gutterBottom>
-                        Progreso del Proyecto
+                    
+                    {/* Project status chip */}
+                    <Chip 
+                      label={project.status} 
+                      size="small" 
+                      sx={{ 
+                        mb: 2,
+                        bgcolor: project.status === 'Completed' 
+                          ? 'rgba(16, 185, 129, 0.1)' 
+                          : project.status === 'In Progress' 
+                            ? 'rgba(142, 48, 49, 0.1)' 
+                            : 'rgba(245, 158, 11, 0.1)',
+                        color: project.status === 'Completed' 
+                          ? '#10b981' 
+                          : project.status === 'In Progress' 
+                            ? '#8e3031' 
+                            : '#f59e0b',
+                        fontWeight: 500,
+                        borderRadius: '6px'
+                      }}
+                    />
+                    
+                    {/* Project description preview */}
+                    {project.description && (
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          mb: 2,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
+                      >
+                        {project.description}
                       </Typography>
+                    )}
+                    
+                    {/* Project progress */}
+                    <Box sx={{ mt: 2, mb: 1 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Typography variant="caption" color="text.secondary">Progreso</Typography>
+                        <Typography variant="caption" fontWeight="medium">{project.progress || 0}%</Typography>
+                      </Box>
                       <LinearProgress 
                         variant="determinate" 
                         value={project.progress || 0}
-                        sx={{ height: 8, borderRadius: 4}}
+                        sx={{
+                          height: 6,
+                          borderRadius: 3,
+                          bgcolor: 'rgba(142, 48, 49, 0.1)',
+                          '& .MuiLinearProgress-bar': {
+                            bgcolor: '#8e3031'
+                          }
+                        }}
                       />
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          Tareas Completadas: {project.taskStats?.completed || 0}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Total: {project.taskStats?.total || 0}
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                      <CalendarIcon fontSize="small" />
-                      <Typography variant="body2">
-                        Creado: {new Date(project.createdAt).toLocaleDateString()}
-                      </Typography>
                     </Box>
                   </CardContent>
-
+                  
+                  {/* Card actions */}
                   <CardActions sx={{ p: 2, pt: 0 }}>
-                    <Button
-                      fullWidth
-                      variant="contained"
-                      startIcon={<TimelineIcon />}
+                    <Button 
+                      size="small" 
                       onClick={() => handleViewDetails(project)}
+                      sx={{
+                        color: '#8e3031',
+                        '&:hover': {
+                          bgcolor: 'rgba(142, 48, 49, 0.1)'
+                        }
+                      }}
                     >
                       Ver Detalles
                     </Button>

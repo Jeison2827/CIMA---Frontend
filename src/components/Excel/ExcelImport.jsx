@@ -195,6 +195,120 @@ const ExcelImport = ({ projectId = 42 }) => {
     }
   };
 
+  // Add handleDownload function
+  const handleDownload = async (fileId) => {
+    if (!fileId) {
+      setError('ID de archivo no válido');
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('No hay sesión activa');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Make request to download endpoint
+      const response = await axios({
+        method: 'get',
+        url: `http://localhost:3000/developer/files/download/${fileId}`,
+        headers: { 'accesstoken': token },
+        responseType: 'blob', // Important: This tells axios to handle the response as a binary blob
+      });
+      
+      // Get the content type from the response
+      const contentType = response.headers['content-type'];
+      
+      // Create a blob with the correct content type
+      const blob = new Blob([response.data], { type: contentType });
+      
+      // Find the file in our files array to get the original name
+      const fileInfo = files.find(file => file.fileId === fileId);
+      
+      // Get filename from Content-Disposition header or use file info or default name
+      let filename = 'downloaded-file';
+      
+      // First try to get from Content-Disposition header
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        // Try different regex patterns for different formats of Content-Disposition
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(contentDisposition);
+        if (matches && matches[1]) {
+          filename = matches[1].replace(/['"]/g, '');
+        }
+      }
+      
+      // If header parsing failed, use the original name from our file list
+      if (filename === 'downloaded-file' && fileInfo && fileInfo.originalName) {
+        filename = fileInfo.originalName;
+      }
+      
+      // Create URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary link element and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
+      setSuccess('Archivo descargado correctamente');
+    } catch (err) {
+      console.error('Error al descargar archivo:', err);
+      setError(`Error al descargar archivo: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add handleDelete function
+  const handleDelete = async (fileId) => {
+    if (!fileId) {
+      setError('ID de archivo no válido');
+      return;
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('No hay sesión activa');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Delete file using API
+      await axios.delete(
+        `http://localhost:3000/developer/files/${fileId}`,
+        {
+          headers: { 'accesstoken': token }
+        }
+      );
+      
+      // Update local state
+      setFiles(files.filter(file => file.fileId !== fileId));
+      setSuccess('Archivo eliminado correctamente');
+      
+      // Close the confirmation dialog
+      setConfirmDelete({ open: false, fileId: null });
+    } catch (err) {
+      console.error('Error al eliminar archivo:', err);
+      setError(`Error al eliminar archivo: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // In the useDropzone configuration, remove the accept restriction to allow all file types
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
       const file = acceptedFiles[0];
@@ -242,11 +356,8 @@ const ExcelImport = ({ projectId = 42 }) => {
         setUploadProgress(0);
       }
     },
-    accept: {
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-      'application/vnd.ms-excel': ['.xls']
-    },
-    maxSize: 5 * 1024 * 1024, // 5MB
+    // Remove the accept restriction to allow all file types
+    maxSize: 10 * 1024 * 1024, // Increased to 10MB
     multiple: false
   });
 
@@ -263,22 +374,22 @@ const ExcelImport = ({ projectId = 42 }) => {
         }}
       >
         <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontWeight: 700, 
-              color: 'primary.main', 
-              mb: 1,
-              background: 'linear-gradient(90deg, #592d2d, #592d2d)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Gestor de Documentos
-          </Typography>
-          <Typography variant="subtitle1" color="#000000  " sx={{ mb: 4 }}>
-            Gestiona y organiza los archivos de tus proyectos de forma eficiente
-          </Typography>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontWeight: 700, 
+                color: 'primary.main', 
+                mb: 1,
+                background: 'linear-gradient(90deg, #592d2d, #592d2d)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              Gestor de Documentos
+            </Typography>
+            <Typography variant="subtitle1" color="#000000" sx={{ mb: 4 }}>
+              Gestiona y organiza archivos de cualquier tipo para tus proyectos
+            </Typography>
 
           
             <CardContent sx={{ p: 3  }}>
@@ -366,7 +477,7 @@ const ExcelImport = ({ projectId = 42 }) => {
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      Tamaño máximo permitido: 5MB
+                      Tamaño máximo permitido: 10MB
                     </Typography>
                   </Box>
                 </Box>

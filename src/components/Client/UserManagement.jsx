@@ -90,7 +90,7 @@ const PageHeader = styled(Box)(({ theme }) => ({
     transform: 'translateX(-50%)',
     width: '60px',
     height: '4px',
-    background: '#592d2d',
+    background: '#8e3031',
     borderRadius: '2px',
   }
 }));
@@ -121,9 +121,7 @@ const SearchBar = styled('div')(({ theme }) => ({
     width: '100%',
     background: alpha('#f3f6f9', 0.7),
     borderRadius: '10px',
-    '&:hover': {
-      background: '#f3f6f9',
-    },
+
   },
   '& .MuiInputBase-input': {
     padding: '12px 12px 12px 45px',
@@ -150,9 +148,7 @@ const StyledTableHead = styled(TableHead)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:hover': {
-    background: alpha('#f3f6f9', 0.3),
-  },
+
   '& .MuiTableCell-root': {
     padding: '16px 24px',
     borderBottom: '1px solid #ebedf3',
@@ -160,6 +156,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// Update StatusChip colors to match the maroon/burgundy theme
 const StatusChip = styled(Box)(({ status }) => ({
   padding: '6px 12px',
   borderRadius: '6px',
@@ -168,12 +165,12 @@ const StatusChip = styled(Box)(({ status }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   ...(status === 'Admin' && {
-    background: alpha('#50cd89', 0.1),
-    color: '#50cd89',
+    background: alpha('#8e3031', 0.1),
+    color: '#8e3031',
   }),
   ...(status === 'Worker' && {
-    background: alpha('#009ef7', 0.1),
-    color: '#009ef7',
+    background: alpha('#592d2d', 0.1),
+    color: '#592d2d',
   }),
   ...(status === 'Client' && {
     background: alpha('#f1416c', 0.1),
@@ -181,23 +178,20 @@ const StatusChip = styled(Box)(({ status }) => ({
   }),
 }));
 
+// Update ActionButton colors to match the maroon/burgundy theme
 const ActionButton = styled(Button)(({ variant }) => ({
   background: variant === 'create' 
-    ? 'linear-gradient(45deg, #3498db 30%, #2980b9 90%)'
+    ? 'linear-gradient(45deg, #8e3031 30%, #592d2d 90%)'
     : 'linear-gradient(45deg, #e74c3c 30%, #c0392b 90%)',
   boxShadow: variant === 'create'
-    ? '0 3px 5px 2px rgba(52, 152, 219, .3)'
+    ? '0 3px 5px 2px rgba(142, 48, 49, .3)'
     : '0 3px 5px 2px rgba(231, 76, 60, .3)',
   borderRadius: '8px',
   padding: '10px 25px',
   color: 'white',
   textTransform: 'none',
   fontWeight: 600,
-  '&:hover': {
-    background: variant === 'create'
-      ? 'linear-gradient(45deg, #2980b9 30%, #2c3e50 90%)'
-      : 'linear-gradient(45deg, #c0392b 30%, #a93226 90%)',
-  }
+
 }));
 
 const UserManagement = () => {
@@ -498,7 +492,7 @@ const UserManagement = () => {
           centered
           sx={{
             '& .MuiTabs-indicator': {
-              backgroundColor: '#592d2d',
+              backgroundColor: '#8e3031',
             },
             '& .MuiTab-root': {
               textTransform: 'none',
@@ -506,9 +500,12 @@ const UserManagement = () => {
               fontSize: '1rem',
               color: '#7e8299',
               '&.Mui-selected': {
-                color: '#592d2d',
+                color: '#8e3031',
                 fontWeight: 600,
               },
+  
+
+   
             },
           }}
         >
@@ -553,11 +550,9 @@ const UserManagement = () => {
                 startIcon={<AddIcon />}
                 onClick={() => openDialog('create')}
                 sx={{
-                  background: 'linear-gradient(135deg,rgb(0, 0  , 0) 0%,rgb(0, 0, 0) 100%)',
+                  background: 'linear-gradient(135deg, #8e3031 0%, #592d2d 100%)',
                   color: 'white',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(207, 215, 224) 100%)',
-                  },
+        
                 }}
               >
                 Nuevo Cliente
@@ -661,8 +656,8 @@ const UserManagement = () => {
                   color: '#7e8299',
                   '&.Mui-selected': {
                     background: '#f3f6f9',
-                    borderColor: '#3699ff',
-                    color: '#3699ff',
+                    borderColor: '#8e3031',
+                    color: '#8e3031',
                   },
                 },
               }}
@@ -687,7 +682,7 @@ const UserManagement = () => {
             borderRadius: '16px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             '& .MuiDialogTitle-root': {
-              background: '#000000',
+              background: '#8e3031',
               color: 'white',
               padding: '20px 24px'
             }
@@ -804,6 +799,11 @@ const UserManagement = () => {
           sx: {
             borderRadius: '16px',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            '& .MuiDialogTitle-root': {
+              background: '#f1416c',
+              color: 'white',
+              padding: '20px 24px'
+            }
           }
         }}
       >
