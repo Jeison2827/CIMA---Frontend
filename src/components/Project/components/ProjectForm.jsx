@@ -100,6 +100,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         status: 'Pending'
       });
     }
+    console.log('index ', formData.clientId.id)
   }, [project, open]);
 
   useEffect(() => {
@@ -123,8 +124,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         
         // Transform client data to match the expected format
         const formattedClients = clientsData.map((client, index) => ({
-          id: index + 1, // Generate an id if not provided by API
-          clientId: index + 1, // Generate a clientId if not provided by API
+          id: client.clientId, // Generate an id if not provided by API // Generate a clientId if not provided by API
           name: client.name,
           email: client.email,
           address: client.address
@@ -154,6 +154,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
       [name]: name === 'clientId' ? (value ? parseInt(value, 10) : '') : value
     }));
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
