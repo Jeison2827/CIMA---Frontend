@@ -323,10 +323,16 @@ const UserManagement = () => {
       toast.error('La contraseña es obligatoria para crear un cliente', { position: 'top-center' });
       return;
     }
+    
+    // Validar que la contraseña tenga al menos 6 caracteres
+    if (dialogMode === 'create' && formData.password.length < 6) {
+      toast.error('La contraseña debe tener al menos 6 caracteres', { position: 'top-center' });
+      return;
+    }
   
     if (formLoading) return;
     setFormLoading(true);
-  
+    
     try {
       if (dialogMode === 'create') {
         // Crear nuevo cliente - usando un objeto directo en lugar de JSON.stringify
