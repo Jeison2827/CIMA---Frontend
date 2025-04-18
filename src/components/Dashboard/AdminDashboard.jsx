@@ -12,7 +12,7 @@ import ProjectsPage from "../Project/pages/ProjectsPage";
 import { ProjectContext, ProjectProvider } from "../../context/ProjectContext";
 // Import TaskList component
 import TaskList from "../TaskTable/TaskList";
-import TaskManagement from "../TaskManagement/taskmanagement";
+import TaskManagement from "../TaskManagement/TaskManagement";
 const DashboardContainer = styled("div")(({ theme }) => ({
   padding: "40px",
   background: "linear-gradient(135deg, #f4f6f8 0%, #e9ecef 100%)",
