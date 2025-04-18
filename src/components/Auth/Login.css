@@ -1,56 +1,117 @@
-/* Login page styles */  
-.login-container {  
-    background-color: #fff;  
-    padding: 40px;  
-    max-width: 400px;  
-    margin: 100px auto;  
-    border-radius: 8px;  
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
-}  
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+  }
   
-h2 {  
-    text-align: center;  
-    margin-bottom: 20px;  
-}  
-
-/* Cambiar selector de input a .input */  
-.input {  
-    border: none;  
-    outline: none;  
-    border-radius: 15px;  
-    padding: 1em;  
-    background-color: #ccc;  
-    box-shadow: inset 2px 5px 10px rgba(0,0,0,0.3);  
-    transition: 300ms ease-in-out;  
-}  
-
-.input:focus {  
-    background-color: white;  
-    transform: scale(1.05);  
-    box-shadow: 13px 13px 100px #969696,  
-                -13px -13px 100px #ffffff;  
-}  
-
-.login-container button {  
-    width: 100%;  
-    padding: 10px;  
-    margin-top: 20px;  
-    background-color: #910000;  
-}  
-
-.login-container button:hover {  
-    background-color: #218838;  
-}  
-
-p {  
-    color: red;  
-    text-align: center;  
-    margin-top: 10px;  
-}  
-
-@media (max-width: 768px) {  
-  .login-container {  
-    padding: 20px;  
-    margin-top: 50px;  
-  }  
-}
+  .wrapper {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Lado izquierdo */
+  .left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fdfdfd;
+  }
+  
+  .login-box {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .login-box h2 {
+    font-size: 22px;
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .login-box h3 {
+    font-size: 16px;
+    text-align: center;
+    color: #7c0a02;
+    margin-bottom: 20px;
+  }
+  
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    transition: all 0.2s ease;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #7c0a02;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(124, 10, 2, 0.2);
+  }
+  
+  button {
+    width: 100%;
+    padding: 12px;
+    background-color: #7c0a02;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #600601;
+    transform: scale(1.02);
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  
+  /* Lado derecho */
+  .right {
+    flex: 1;
+    background: linear-gradient(to bottom right, #1c1c1c, #7c0a02);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+  }
+  
+  .right h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+  
+  .right p {
+    font-size: 18px;
+    color: #ddd;
+  }
+  
+  /* Responsivo */
+  @media screen and (max-width: 768px) {
+    .wrapper {
+      flex-direction: column;
+    }
+  
+    .right {
+      padding: 30px;
+      text-align: center;
+    }
+  }
+  
