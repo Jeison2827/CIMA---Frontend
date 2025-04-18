@@ -21,7 +21,7 @@ export const getClientById = createAsyncThunk('clients/getById', async (clientId
 
 // Acción para crear un cliente
 export const createClient = createAsyncThunk('clients/create', async (newClient) => {
-  const response = await axios.post('http://51.79.68.121:3000/developer/users/register', newClient,{
+  const response = await axios.post('http://51.79.68.121:5173/developer/users/register', newClient,{
     headers:{
       'accesstoken':localStorage.getItem('accessToken'),
     }
@@ -31,7 +31,7 @@ export const createClient = createAsyncThunk('clients/create', async (newClient)
 
 // Acción para actualizar un cliente
 export const updateClient = createAsyncThunk('clients/update', async ({ id, updatedClient }) => {
-  const response = await axios.put(`http://51.79.68.121:3000/developer/clients/${id}`, updatedClient,{
+  const response = await axios.put(`http://51.79.68.121:5173/developer/clients/${id}`, updatedClient,{
     headers:{
       'accesstoken':localStorage.getItem('accessToken'),
     }
@@ -42,7 +42,7 @@ export const updateClient = createAsyncThunk('clients/update', async ({ id, upda
 // Acción para eliminar un cliente
 export const deleteClient = createAsyncThunk('clients/delete', async (clientId, { rejectWithValue }) => {
   try {
-    const response = await axios.delete(`http://51.79.68.121:3000/developer/clients/${clientId}`, {
+    const response = await axios.delete(`http://51.79.68.121:5173/developer/clients/${clientId}`, {
       headers: {
         'accesstoken': localStorage.getItem('accessToken'),
       },

@@ -105,7 +105,7 @@ const AdminDashboard = () => {
         const config = {
           method: 'post',
           maxBodyLength: Infinity,
-          url: 'http://51.79.68.121:3000/developer/users/register',
+          url: 'http://51.79.68.121:5173/developer/users/register',
           headers: { 
             'Content-Type': 'application/json', 
             'Authorization': '••••••' // Ajusta el token o credenciales según corresponda

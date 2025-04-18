@@ -6,7 +6,7 @@ import qs from 'qs';
 
 export const ProjectContext = createContext();
 
-const API_BASE_URL = 'http://51.79.68.121:3000/developer/projects';
+const API_BASE_URL = 'http://51.79.68.121:5173/developer/projects';
 
 export const ProjectProvider = ({ children }) => {
   const auth = useSelector((state) => state.auth);
@@ -232,7 +232,7 @@ export const ProjectProvider = ({ children }) => {
   const getAllClients = async () => {
     try {
       const response = await axiosInstance.get('/clients', {
-        baseURL: 'http://51.79.68.121:3000/developer/projects'
+        baseURL: 'http://51.79.68.121:5173/developer/projects'
       });
       
       //console.log.log('Respuesta de clientes:', response.data);

@@ -30,7 +30,7 @@ const FaqClient = () => {
     const fetchFaqs = async () => {
       try {
         const response = await axios.get(
-          'http://51.79.68.121:3000/developer/faqs/all',
+          'http://51.79.68.121:5173/developer/faqs/all',
           {
             headers: { 'accesstoken': accessToken }
           }
