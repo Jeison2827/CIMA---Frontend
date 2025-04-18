@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { store } from '../redux/store';
 
-const API_URL = 'http://localhost:3000/developer/tasks';
+const API_URL = 'http://51.79.68.121:3000/developer/tasks';
 
 // Helper function to get the authentication token from Redux store
 const getAuthToken = () => {

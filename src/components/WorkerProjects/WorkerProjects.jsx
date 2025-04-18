@@ -213,7 +213,7 @@ const WorkerProjects = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:3000/developer/projects/worker/projects',
+          'http://51.79.68.121:3000/developer/projects/worker/projects',
           {
             headers: { 'accesstoken': accessToken }
           }
@@ -233,7 +233,7 @@ const WorkerProjects = () => {
   const handleStatusChange = async (projectId, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:3000/developer/projects/${projectId}/status`,
+        `http://51.79.68.121:3000/developer/projects/${projectId}/status`,
         { status: newStatus },
         { headers: { 'accesstoken': accessToken } }
       );
@@ -264,7 +264,7 @@ const WorkerProjects = () => {
         return;
       }
       const response = await axios.get(
-        `http://localhost:3000/developer/projects/${projectId}/worker/tasks`, // Updated endpoint
+        `http://51.79.68.121:3000/developer/projects/${projectId}/worker/tasks`, // Updated endpoint
         {
           headers: { 'accesstoken': accessToken }
         }

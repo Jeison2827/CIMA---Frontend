@@ -110,7 +110,7 @@ const ProjectForm = ({ open, onClose, onSubmit, project = null }) => {
         setError(null);
         
         // Use axios to fetch clients directly from the endpoint
-        const response = await axios.get('http://localhost:3000/developer/clients', {
+        const response = await axios.get('http://51.79.68.121:3000/developer/clients', {
           headers: {
             'accesstoken': localStorage.getItem('accessToken') // Assuming you store the token in localStorage
           }
