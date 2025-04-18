@@ -178,7 +178,7 @@ const UsersInterface = ({ token }) => {
     const fetchStaffUsers = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://51.79.68.121:5173/developer/users/staff', {
+        const response = await axios.get('http://51.79.68.121:3000/developer/users/staff', {
           headers: {
             'Content-Type': 'application/json',
             'accesstoken': token
@@ -267,7 +267,7 @@ const UsersInterface = ({ token }) => {
 
         // Configuración para la petición
         const response = await axios.post(
-          'http://51.79.68.121:5173/developer/users/register',
+          'http://51.79.68.121:3000/developer/users/register',
           userData,
           {
             headers: {
@@ -321,7 +321,7 @@ const UsersInterface = ({ token }) => {
           
           // Update user using the correct endpoint
           const response = await axios.put(
-            `http://51.79.68.121:5173/developer/users/${userId}`,
+            `http://51.79.68.121:3000/developer/users/${userId}`,
             updateData,
             {
               headers: {
@@ -376,7 +376,7 @@ const UsersInterface = ({ token }) => {
       console.log('Attempting to delete user with ID:', userId);
       
       // Eliminar usuario
-      await axios.delete(`http://51.79.68.121:5173/developer/users/${userId}`, {
+      await axios.delete(`http://51.79.68.121:3000/developer/users/${userId}`, {
         headers: {
           'Content-Type': 'application/json',
           'accesstoken': token

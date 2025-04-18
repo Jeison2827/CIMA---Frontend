@@ -245,7 +245,7 @@ const UserManagement = () => {
       try {
         setLoading(true);
         // Changing the endpoint from /developer/clients to /clients
-        const response = await axios.get('http://51.79.68.121:5173/developer/clients', {
+        const response = await axios.get('http://51.79.68.121:3000/developer/clients', {
           headers: {
             'Content-Type': 'application/json',
             'accesstoken': token
@@ -362,7 +362,7 @@ const UserManagement = () => {
         // Usar axios directamente sin config
         const response = await axios({
           method: 'post',
-          url: 'http://51.79.68.121:5173/developer/clients/register',
+          url: 'http://51.79.68.121:3000/developer/clients/register',
           headers: { 
             'Content-Type': 'application/json',
             'accesstoken': token
@@ -378,7 +378,7 @@ const UserManagement = () => {
         closeDialog();
         
         // Refrescar la lista de clientes después de crear uno nuevo
-        const refreshResponse = await axios.get('http://51.79.68.121:5173/developer/clients', {
+        const refreshResponse = await axios.get('http://51.79.68.121:3000/developer/clients', {
           headers: {
             'Content-Type': 'application/json',
             'accesstoken': token
@@ -406,7 +406,7 @@ const UserManagement = () => {
 
         // Actualizar cliente existente con el endpoint correcto usando clientId
         await axios.put(
-          `http://51.79.68.121:5173/developer/clients/${clientId}`,
+          `http://51.79.68.121:3000/developer/clients/${clientId}`,
           updateData,
           {
             headers: {
@@ -463,7 +463,7 @@ const UserManagement = () => {
       console.log('Attempting to delete client with ID:', clientId);
       
       // Eliminar cliente con el endpoint correcto usando clientId
-      await axios.delete(`http://51.79.68.121:5173/developer/clients/${clientId}`, {
+      await axios.delete(`http://51.79.68.121:3000/developer/clients/${clientId}`, {
         headers: {
           'Content-Type': 'application/json',
           'accesstoken': token

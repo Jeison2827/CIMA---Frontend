@@ -113,7 +113,7 @@ const TaskManagement = () => {
   const fetchAllProjects = async () => {
     try {
       // Using the correct endpoint for projects
-      const response = await axios.get(`http://51.79.68.121:5173/developer/projects`, getHeaders());
+      const response = await axios.get(`http://51.79.68.121:3000/developer/projects`, getHeaders());
       
       if (response.data.success && Array.isArray(response.data.projects)) {
         setAllProjects(response.data.projects, "esto es response");
@@ -147,7 +147,7 @@ const fetchAllWorkers = async () => {
     }
     
     const response = await axios.get(
-      'http://51.79.68.121:5173/developer/users/workers',
+      'http://51.79.68.121:3000/developer/users/workers',
       {
         headers: {
           'accessToken': accessToken

@@ -66,7 +66,7 @@ const ClientProjects = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          'http://51.79.68.121:5173/developer/projects/my-projects',
+          'http://51.79.68.121:3000/developer/projects/my-projects',
           {
             headers: { 'accesstoken': accessToken }
           }

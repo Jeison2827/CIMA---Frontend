@@ -144,7 +144,7 @@ const ExcelImport = ({ projectId = 42 }) => {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.get(
-        'http://51.79.68.121:5173/developer/projects',
+        'http://51.79.68.121:3000/developer/projects',
         {
           headers: { 'accesstoken': token }
         }
@@ -184,7 +184,7 @@ const ExcelImport = ({ projectId = 42 }) => {
 
     try {
       const response = await axios.get(
-        `http://51.79.68.121:5173/developer/files/project/${projectId}`,
+        `http://51.79.68.121:3000/developer/files/project/${projectId}`,
         {
           headers: { 'accesstoken': token }
         }
@@ -214,7 +214,7 @@ const ExcelImport = ({ projectId = 42 }) => {
       // Make request to download endpoint
       const response = await axios({
         method: 'get',
-        url: `http://51.79.68.121:5173/developer/files/download/${fileId}`,
+        url: `http://51.79.68.121:3000/developer/files/download/${fileId}`,
         headers: { 'accesstoken': token },
         responseType: 'blob', // Important: This tells axios to handle the response as a binary blob
       });
@@ -288,7 +288,7 @@ const ExcelImport = ({ projectId = 42 }) => {
       
       // Delete file using API
       await axios.delete(
-        `http://51.79.68.121:5173/developer/files/${fileId}`,
+        `http://51.79.68.121:3000/developer/files/${fileId}`,
         {
           headers: { 'accesstoken': token }
         }
@@ -334,7 +334,7 @@ const ExcelImport = ({ projectId = 42 }) => {
 
       try {
         const response = await axios.post(
-          `http://51.79.68.121:5173/developer/files/${selectedProject}`,
+          `http://51.79.68.121:3000/developer/files/${selectedProject}`,
           formData,
           {
             headers: {

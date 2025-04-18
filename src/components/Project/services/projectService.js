@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://51.79.68.121:5173/api/projects';
+const API_URL = 'http://51.79.68.121:3000/api/projects';
 
 export const getProjects = async () => {
     const response = await axios.get(API_URL);
