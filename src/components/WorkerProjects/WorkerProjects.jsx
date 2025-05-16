@@ -190,9 +190,9 @@ const WorkerProjects = () => {
         </Typography>
 
         <ProjectMetadata>
-          <CalendarIcon fontSize="small" />
+         
           <Typography variant="body2">
-            Inicio: {new Date(project.startDate).toLocaleDateString()}
+           
           </Typography>
         </ProjectMetadata>
       </CardContent>
