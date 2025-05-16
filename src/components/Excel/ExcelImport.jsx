@@ -216,36 +216,19 @@ const ExcelImport = ({ projectId = 42 }) => {
         method: 'get',
         url: `http://51.79.68.121:3000/developer/files/download/${fileId}`,
         headers: { 'accesstoken': token },
-        responseType: 'blob', // Important: This tells axios to handle the response as a binary blob
       });
       
-      // Get the content type from the response
-      const contentType = response.headers['content-type'];
+      // Extract file data from response
+      const { fileName, mimeType } = response.data.fileData;
       
-      // Create a blob with the correct content type
-      const blob = new Blob([response.data], { type: contentType });
-      
-      // Find the file in our files array to get the original name
-      const fileInfo = files.find(file => file.fileId === fileId);
-      
-      // Get filename from Content-Disposition header or use file info or default name
-      let filename = 'downloaded-file';
-      
-      // First try to get from Content-Disposition header
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        // Try different regex patterns for different formats of Content-Disposition
-        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-        const matches = filenameRegex.exec(contentDisposition);
-        if (matches && matches[1]) {
-          filename = matches[1].replace(/['"]/g, '');
-        }
+      // Create a blob from the base64 content
+      const byteCharacters = atob(response.data.fileData.base64Content);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      
-      // If header parsing failed, use the original name from our file list
-      if (filename === 'downloaded-file' && fileInfo && fileInfo.originalName) {
-        filename = fileInfo.originalName;
-      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
       
       // Create URL for the blob
       const url = window.URL.createObjectURL(blob);
@@ -253,7 +236,7 @@ const ExcelImport = ({ projectId = 42 }) => {
       // Create a temporary link element and trigger download
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', filename);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       
